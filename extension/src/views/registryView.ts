@@ -5,6 +5,7 @@ import * as nls from 'vscode-nls/node';
 import { ExtensionInfoService } from '../extensionInfo';
 import { Package, PackageState } from '../Package';
 import { Registry } from '../Registry';
+import * as registry from '../Registry';
 import { RegistryProvider } from '../RegistryProvider';
 
 import { ExtensionDetailsView } from './extensionDetailsView';
@@ -131,7 +132,7 @@ class ExtensionsProvider implements TreeDataProvider<Element>, Disposable {
     public getRegistries() {
         if (this.children === undefined) {
             this.children = this.registryProvider.getRegistries();
-            this.children.sort(Registry.compare);
+            this.children.sort(registry.compare);
         }
 
         return this.children;
@@ -290,14 +291,12 @@ class ExtensionItem extends BaseItem {
 }
 
 function elementToNode(element: Element): BaseItem {
-    if (element instanceof Registry) {
-        return new RegistryItem(element);
-    }
     if (element instanceof Package) {
         return new ExtensionItem(element);
-    }
-    if (typeof element === 'string') {
+    } else if (typeof element === 'string') {
         return new MessageItem(element);
+    } else {
+        return new RegistryItem(element);
     }
 
     throw new Error('Unexpected object: ' + element);

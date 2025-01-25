@@ -9,8 +9,9 @@ import * as vscode from 'vscode';
 import { Uri } from 'vscode';
 
 import { ExtensionInfoService } from '../../extensionInfo';
+import { NpmRegistry } from '../../NpmRegistry';
 import { Package } from '../../Package';
-import { Registry, RegistrySource } from '../../Registry';
+import { RegistrySource } from '../../Registry';
 import { LATEST } from '../../releaseChannel';
 import { clearCache, mockSearch, PackageMetadata } from '../util';
 
@@ -70,7 +71,7 @@ suite('Registry Package Search', function () {
     });
 
     test('Create registry', async function () {
-        const registry = new Registry(extensionInfo, 'test', RegistrySource.Workspace, {
+        const registry = new NpmRegistry(extensionInfo, 'test', RegistrySource.Workspace, {
             registry: REGISTRY_URL,
             query: 'query',
             otp: 123456,
@@ -86,7 +87,7 @@ suite('Registry Package Search', function () {
     });
 
     test('Get all packages', async function () {
-        const registry = new Registry(extensionInfo, 'test', RegistrySource.User, {
+        const registry = new NpmRegistry(extensionInfo, 'test', RegistrySource.User, {
             registry: REGISTRY_URL,
         });
 
@@ -98,7 +99,7 @@ suite('Registry Package Search', function () {
     });
 
     test('Get keyword 1', async function () {
-        const registry = new Registry(extensionInfo, 'test', RegistrySource.User, {
+        const registry = new NpmRegistry(extensionInfo, 'test', RegistrySource.User, {
             registry: REGISTRY_URL,
             query: 'keywords:foo',
         });
@@ -111,7 +112,7 @@ suite('Registry Package Search', function () {
     });
 
     test('Get keyword 2', async function () {
-        const registry = new Registry(extensionInfo, 'test', RegistrySource.User, {
+        const registry = new NpmRegistry(extensionInfo, 'test', RegistrySource.User, {
             registry: REGISTRY_URL,
             query: 'keywords:bar',
         });
@@ -124,7 +125,7 @@ suite('Registry Package Search', function () {
     });
 
     test('Get keyword 3', async function () {
-        const registry = new Registry(extensionInfo, 'test', RegistrySource.User, {
+        const registry = new NpmRegistry(extensionInfo, 'test', RegistrySource.User, {
             registry: REGISTRY_URL,
             query: 'keywords:b-packages',
         });
@@ -137,7 +138,7 @@ suite('Registry Package Search', function () {
     });
 
     test('Get two keywords with string', async function () {
-        const registry = new Registry(extensionInfo, 'test', RegistrySource.User, {
+        const registry = new NpmRegistry(extensionInfo, 'test', RegistrySource.User, {
             registry: REGISTRY_URL,
             query: 'keywords:foo keywords:bar',
         });
@@ -151,7 +152,7 @@ suite('Registry Package Search', function () {
 
     test('Get two keywords with array', async function () {
         // query = ['term1', 'term2'] should be identical to 'term1 term2'.
-        const registry = new Registry(extensionInfo, 'test', RegistrySource.User, {
+        const registry = new NpmRegistry(extensionInfo, 'test', RegistrySource.User, {
             registry: REGISTRY_URL,
             query: ['keywords:foo', 'keywords:bar'],
         });
@@ -164,7 +165,7 @@ suite('Registry Package Search', function () {
     });
 
     test('Get package metadata', async function () {
-        const registry = new Registry(extensionInfo, 'test', RegistrySource.User, {
+        const registry = new NpmRegistry(extensionInfo, 'test', RegistrySource.User, {
             registry: REGISTRY_URL,
         });
 

@@ -11,8 +11,9 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from '../../extensionInfo';
+import { NpmRegistry } from '../../NpmRegistry';
 import { Package } from '../../Package';
-import { Registry, RegistrySource } from '../../Registry';
+import { RegistrySource } from '../../Registry';
 import { RegistryProvider } from '../../RegistryProvider';
 import { stubGlobalConfiguration } from '../stubs';
 import { clearCache, mockSearch, PackageMetadata } from '../util';
@@ -395,7 +396,7 @@ const EXPECT_PACKAGE: Record<string, Partial<Package>> = {
     },
 };
 
-const EXPECT_REGISTRY: Record<string, Partial<Registry>> = {
+const EXPECT_REGISTRY: Record<string, Partial<NpmRegistry>> = {
     workspace1: {
         name: 'Workspace Registry 1',
         uri: vscode.Uri.parse(WORKSPACE_REGISTRY_URL),

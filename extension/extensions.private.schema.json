@@ -16,12 +16,23 @@
                         "type": "string"
                     },
                     "registry": {
-                        "description": "The address of the NPM registry which contains the extension packages. If omitted, the registry is determined according to NPM config files (https://docs.npmjs.com/files/npmrc).",
+                        "description": "The address of the registry which contains the extension packages. If omitted, and the registry type is npm, the registry is determined according to NPM config files (https://docs.npmjs.com/files/npmrc). If the registry type is vsx, the registry is openVPX",
                         "type": "string"
+                    },
+                    "type": {
+                        "description": "The type of the registry. Defaults to npm.",
+                        "type": "string",
+                        "enum": [
+                            "npm",
+                            "vsx"
+                        ]
                     },
                     "query": {
                         "description": "Display only packages that match this query. This is either an array of search terms or a string with space-delimited terms. See https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#get-v1search",
-                        "type": ["string", "array"],
+                        "type": [
+                            "string",
+                            "array"
+                        ],
                         "items": {
                             "type": "string"
                         }

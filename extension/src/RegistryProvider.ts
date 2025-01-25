@@ -7,6 +7,7 @@ import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from './extensionInfo';
 import { getLogger } from './logger';
+import { NpmRegistry } from './NpmRegistry';
 import { Package } from './Package';
 import { Registry, RegistrySource } from './Registry';
 import { assertType, options } from './typeUtil';
@@ -31,7 +32,7 @@ const ExtensionsConfig = t.partial({
 type ExtensionsConfig = t.TypeOf<typeof ExtensionsConfig>;
 
 /**
- * Provides NPM registries collected from user and workspace configuration.
+ * Provides registries collected from user and workspace configuration.
  */
 export class RegistryProvider implements Disposable {
     private _onDidChangeRegistries = new EventEmitter<void>();
@@ -194,7 +195,7 @@ export class RegistryProvider implements Disposable {
 
         for (const item of userRegistries) {
             const { name, ...options } = item;
-            this.userRegistries.push(new Registry(this.extensionInfo, name, RegistrySource.User, options));
+            this.userRegistries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.User, options));
         }
     }
 
@@ -336,7 +337,7 @@ class FolderRegistryProvider implements Disposable {
         if (config.registries) {
             for (const registry of config.registries) {
                 const { name, ...options } = registry;
-                this.registries.push(new Registry(this.extensionInfo, name, RegistrySource.Workspace, options));
+                this.registries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.Workspace, options));
             }
         }
 

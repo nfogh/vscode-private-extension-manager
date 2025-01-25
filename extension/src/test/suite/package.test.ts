@@ -8,8 +8,9 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from '../../extensionInfo';
+import { NpmRegistry } from '../../NpmRegistry';
 import { NotAnExtensionError, Package, PackageState } from '../../Package';
-import { Registry, RegistrySource } from '../../Registry';
+import { RegistrySource } from '../../Registry';
 import { CommonStubs, stubGlobalConfiguration, stubRemoteName } from '../stubs';
 
 nls.config({ locale: 'pseudo' });
@@ -25,7 +26,7 @@ suite('Package', function () {
      * tests on `Package` objects.
      */
     function getDummyRegistry() {
-        return new Registry(extensionInfo, 'test', RegistrySource.Workspace, {
+        return new NpmRegistry(extensionInfo, 'test', RegistrySource.Workspace, {
             registry: 'localhost',
         });
     }

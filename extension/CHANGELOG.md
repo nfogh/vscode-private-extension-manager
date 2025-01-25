@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.9.0
+
+-   Added support for vsx repositories
+
 ## 1.8.0
 
 -   Fixed incorrect extension version comparisons. Thanks, [denielig](https://github.com/denielig)!
