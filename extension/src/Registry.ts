@@ -1,4 +1,3 @@
-import { Options } from 'libnpmsearch';
 import { SemVer } from 'semver';
 import { CancellationToken, Uri } from 'vscode';
 import * as nls from 'vscode-nls/node';
@@ -72,7 +71,6 @@ export interface VersionInfo {
 export interface Registry {
     readonly query: string | string[];
     readonly enablePagination: boolean;
-    readonly options: Partial<Options>;
     readonly extensionInfo: ExtensionInfoService;
     readonly name: string;
     readonly source: RegistrySource;

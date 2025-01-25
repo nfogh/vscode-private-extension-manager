@@ -13,7 +13,7 @@ import { NpmRegistry } from '../../NpmRegistry';
 import { Package } from '../../Package';
 import { RegistrySource } from '../../Registry';
 import { LATEST } from '../../releaseChannel';
-import { clearCache, mockSearch, PackageMetadata } from '../util';
+import { clearCache, mockSearch, PackageMetadata } from '../npmUtil';
 
 use(chaiSubset);
 
