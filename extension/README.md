@@ -3,9 +3,9 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 Private Extension Manager lets you find, install, and update extensions from any
-NPM registry. This lets you distribute organization-specific extensions using a
-private registry server such as [Sonatype Nexus](https://www.sonatype.com/product-nexus-repository)
-or [Verdaccio](https://verdaccio.org).
+NPM or VSX registry. This lets you distribute organization-specific extensions using a
+private NPM registry server such as [Sonatype Nexus](https://www.sonatype.com/product-nexus-repository)
+or [Verdaccio](https://verdaccio.org). Or using an openVSX instance.
 
 # Managing Extensions
 
@@ -22,7 +22,7 @@ you can use it.
 
 # Setup
 
-## Publishing Extensions
+## Publishing Extensions (NPM registry)
 
 To allow Private Extension Manager to find your extension,
 [package it in the VSIX format using vsce](https://code.visualstudio.com/api/working-with-extensions/publishing-extension),
@@ -116,9 +116,13 @@ The package must include all files listed. `default` (_optional_) is used to sel
 a file in case none of the explicit keys matches; otherwise an error is shown on
 unsupported platforms.
 
+## OpenVSX repositories
+
+For Open VSX repositories, follow the guides found in the Open VSX pages.
+
 ## Discovering Extensions
 
-Now that your extensions are published to an NPM registry, you need to tell
+Now that your extensions are published to an NPM or OpenVSX registry, you need to tell
 Private Extension Manager how to find them. This can be done using a workspace
 config file and/or a user setting.
 
@@ -140,6 +144,7 @@ The file has the following structure:
         {
             "name": "My Private Registry",
             "registry": "https://my-private.registry",
+            "type": "npm"
         }
     ],
     "recommendations": [
@@ -148,7 +153,7 @@ The file has the following structure:
 }
 ```
 
-The `registries` array defines one or more NPM registries to search for private
+The `registries` array defines one or more registries to search for private
 extensions. Each item supports the following fields:
 
 -   **name**: Name to display for the registry.
@@ -163,7 +168,8 @@ extensions. Each item supports the following fields:
     Set it to false when using a server that doesn't properly handle the `from` parameter of the NPM search API.
     You may also need to increase `limit` to get all results if this is disabled.
 -   **limit**: (Optional) Number of results to limit each query to when requesting package results. Default: 100.
--   Any options supported by [npm-registry-fetch](https://github.com/npm/npm-registry-fetch#-fetch-options).
+-   **type**: (Optional) The type of the repository. Can be `npm` or `vsx`. If not given, it defaults to `npm`.
+-   If the type is npm, any options supported by [npm-registry-fetch](https://github.com/npm/npm-registry-fetch#-fetch-options).
     Use these if you need to set authentication, a proxy, or other options.
 
 The `recommendations` array is an optional list of private extensions from any
@@ -259,7 +265,7 @@ Manager where the extension should be installed.
 
 ## Troubleshooting
 
-If you are successfully connecting to a private NPM registry and don't see any
+If you are successfully connecting to a private registry and don't see any
 errors, but you don't see any extensions either, first open the Output panel
 (Ctrl+Shift+U) and check the dropdown list for "Private Extension Manager".
 If it is present, it may contain information as to why extension packages are
