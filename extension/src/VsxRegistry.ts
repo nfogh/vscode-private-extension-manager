@@ -1,9 +1,11 @@
+import { isLeft } from 'fp-ts/lib/Either';
+import { PathReporter } from 'io-ts/lib/PathReporter';
 import { CancellationToken, Uri } from 'vscode';
 
 import { ExtensionInfoService } from './extensionInfo';
 import { Package } from './Package';
 import { Registry, RegistrySource, VersionInfo } from './Registry';
-//import { SearchEntry, SearchResult } from './VsxRegistryTypes';
+import { SearchResult, SearchResultRT } from './VsxRegistryTypes';
 
 /**
  * Represents a registry.
@@ -48,12 +50,16 @@ export class VsxRegistry implements Registry {
      * @param _token Token to use to cancel the search.
      */
     async getPackages(_token?: CancellationToken): Promise<Package[]> {
-        //const reply = await fetch(`${this.registryUrl}/api/-/search?text={this.query}`);
-        //const searchResult: SearchResult = await reply.json();
+        const reply = await fetch(`${this.registryUrl}/api/-/search?text=${this.query}`);
+        const searchResult: SearchResult = await reply.json();
 
-        return [];
+        const result = SearchResultRT.decode(searchResult);
 
-        //return searchResult.extensions.map((entry: SearchEntry) => new Package(this, {}));
+        if (isLeft(result)) {
+            throw new Error(`Invalid response ${PathReporter.report(result).join(',')}`);
+        }
+
+        return result.right.extensions.map((entry) => new Package(this, { name: entry.name }));
     }
 
     /**

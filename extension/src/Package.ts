@@ -34,12 +34,6 @@ export enum PackageState {
 }
 
 /**
- * Error thrown when constructing a `Package` from a package manifest that is
- * not a Visual Studio Code extension.
- */
-export class NotAnExtensionError extends Error {}
-
-/**
  * Represents a result containing a value.
  */
 type ResultSuccess<T> = { type: 'success'; value: T };
@@ -85,16 +79,6 @@ const PackageManifest = options(
 type PackageManifest = t.TypeOf<typeof PackageManifest>;
 
 /**
- * Fields required for VS Code extensions.
- */
-const VSCodeExtensionFields = t.type({
-    engines: t.type({
-        vscode: t.string,
-    }),
-});
-type VSCodeExtensionFields = t.TypeOf<typeof VSCodeExtensionFields>;
-
-/**
  * Represents an NPM package for an extension.
  */
 export class Package {
@@ -137,19 +121,11 @@ export class Package {
      * @param registry The `Registry` that contains the package.
      * @param manifest The version-specific package manifest for the extension.
      * @param channel The NPM dist-tag this package is tracking, or a specific version it is pinned to.
-     * @throws {NotAnExtensionError} `manifest` is not a Visual Studio Code extension.
      */
     constructor(registry: Registry, manifest: Record<string, unknown>, channel = LATEST) {
         this.registry = registry;
 
         assertType(manifest, PackageManifest);
-
-        assertType(
-            manifest,
-            VSCodeExtensionFields,
-            localize('package.not.an.extension', 'Package {0} is not an extension', manifest.name),
-            NotAnExtensionError,
-        );
 
         this.name = manifest.name;
         this.channel = channel;

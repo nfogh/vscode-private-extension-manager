@@ -25,10 +25,8 @@
             "args": [
                 "${workspaceFolder}/src/test-fixtures/fixture1",
                 "--extensionDevelopmentPath=${workspaceFolder}",
-                "--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
-            ],
-            "outFiles": [
-                "${workspaceFolder}/out/test/**/*.js"
+                "--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
+                "--disable-extensions"
             ],
             "preLaunchTask": "npm: test-watch"
         }

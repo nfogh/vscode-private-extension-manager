@@ -9,7 +9,7 @@ import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from '../../extensionInfo';
 import { NpmRegistry } from '../../NpmRegistry';
-import { NotAnExtensionError, Package, PackageState } from '../../Package';
+import { Package, PackageState } from '../../Package';
 import { RegistrySource } from '../../Registry';
 import { CommonStubs, stubGlobalConfiguration, stubRemoteName } from '../stubs';
 
@@ -741,33 +741,6 @@ suite('Package', function () {
             },
             TypeError,
             '\uFF3BExpeecteed string aat files.1 buut goot 42\uFF3D',
-        );
-    });
-
-    test('Invalid manifest: missing engines.vscode', async function () {
-        assert.throws(
-            () => {
-                new Package(getDummyRegistry(), {
-                    name: 'test-package',
-                    publisher: 'Test',
-                    version: '1.2.3',
-                });
-            },
-            NotAnExtensionError,
-            `\uFF3B\uFF3BPaackaagee test-package iis noot aan eexteensiioon\uFF3D: \uFF3BExpeecteed { vscode: string } aat engines buut goot undefined\uFF3D\uFF3D`,
-        );
-    });
-
-    test('Invalid manifest: wrong engines.vscode type', async function () {
-        assert.throws(
-            () => {
-                new Package(getDummyRegistry(), {
-                    name: 'test-package',
-                    engines: { vscode: 42 },
-                });
-            },
-            NotAnExtensionError,
-            `\uFF3B\uFF3BPaackaagee test-package iis noot aan eexteensiioon\uFF3D: \uFF3BExpeecteed string aat engines.vscode buut goot 42\uFF3D\uFF3D`,
         );
     });
 

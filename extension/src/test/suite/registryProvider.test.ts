@@ -15,8 +15,8 @@ import { NpmRegistry } from '../../NpmRegistry';
 import { Package } from '../../Package';
 import { RegistrySource } from '../../Registry';
 import { RegistryProvider } from '../../RegistryProvider';
-import { stubGlobalConfiguration } from '../stubs';
 import { clearCache, mockSearch, PackageMetadata } from '../npmUtil';
+import { stubGlobalConfiguration } from '../stubs';
 
 use(chaiSubset);
 use(chaiSubsetInOrder);

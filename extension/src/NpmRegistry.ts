@@ -13,13 +13,29 @@ import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from './extensionInfo';
 import { getLogger } from './logger';
-import { NotAnExtensionError, Package } from './Package';
+import { Package } from './Package';
 import { Registry, RegistrySource, VersionMissingError, RegistryOptions, VersionInfo } from './Registry';
 import { getReleaseChannel, LATEST } from './releaseChannel';
 import { assertType, options } from './typeUtil';
 import { getNpmCacheDir, getNpmDownloadDir, uriEquals, toString } from './util';
 
 const localize = nls.loadMessageBundle();
+
+/**
+ * Fields required for VS Code extensions.
+ */
+const VSCodeExtensionFields = t.type({
+    engines: t.type({
+        vscode: t.string,
+    }),
+});
+type VSCodeExtensionFields = t.TypeOf<typeof VSCodeExtensionFields>;
+
+/**
+ * Error thrown when constructing a `Package` from a package manifest that is
+ * not a Visual Studio Code extension.
+ */
+export class NotAnExtensionError extends Error {}
 
 /**
  * Don't try to request any more packages than this. If we get this many results,
@@ -232,6 +248,13 @@ export class NpmRegistry implements Registry {
         }
 
         const manifest = lookupVersion(metadata, name, version);
+
+        assertType(
+            manifest,
+            VSCodeExtensionFields,
+            localize('package.not.an.extension', 'Package {0} is not an extension', manifest.name),
+            NotAnExtensionError,
+        );
         return new Package(this, manifest, version);
     }
 
