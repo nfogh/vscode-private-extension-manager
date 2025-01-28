@@ -183,7 +183,7 @@ export class NpmRegistry implements Registry {
     /**
      * Gets the full package metadata for a package.
      */
-    public async getPackageMetadata(name: string): Promise<Record<string, unknown>> {
+    private async getPackageMetadata(name: string): Promise<Record<string, unknown>> {
         const spec = npa(name);
         return await npmfetch.json(`/${spec.escapedName}`, this.options);
     }

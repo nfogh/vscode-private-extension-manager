@@ -97,11 +97,6 @@ export interface Registry {
     getPackages(token?: CancellationToken): Promise<Package[]>;
 
     /**
-     * Gets the full package metadata for a package.
-     */
-    getPackageMetadata(name: string): Promise<Record<string, unknown>>;
-
-    /**
      * Gets the release channels available for a package.
      *
      * This is a dictionary with channel names as keys and the latest version

@@ -12,6 +12,7 @@ import { Package } from './Package';
 import { Registry, RegistrySource } from './Registry';
 import { assertType, options } from './typeUtil';
 import { getConfig, readJSONSync } from './util';
+import { VsxRegistry } from './VsxRegistry';
 
 const localize = nls.loadMessageBundle();
 
@@ -21,6 +22,7 @@ const UserRegistry = options(
     },
     {
         registry: t.string,
+        type: t.union([t.literal('npm'), t.literal('vsx')]),
     },
 );
 type UserRegistry = t.TypeOf<typeof UserRegistry>;
@@ -194,8 +196,14 @@ export class RegistryProvider implements Disposable {
         const userRegistries = this.getUserRegistryConfig();
 
         for (const item of userRegistries) {
-            const { name, ...options } = item;
-            this.userRegistries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.User, options));
+            const { name, type, ...options } = item;
+            if (type === 'vsx') {
+                this.userRegistries.push(
+                    new VsxRegistry(name, RegistrySource.User, item.registry ?? 'https://open-vsx.org'),
+                );
+            } else {
+                this.userRegistries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.User, options));
+            }
         }
     }
 
@@ -336,8 +344,15 @@ class FolderRegistryProvider implements Disposable {
 
         if (config.registries) {
             for (const registry of config.registries) {
-                const { name, ...options } = registry;
-                this.registries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.Workspace, options));
+                const { name, type, ...options } = registry;
+
+                if (type === 'vsx') {
+                    this.registries.push(
+                        new VsxRegistry(name, RegistrySource.Workspace, registry.registry ?? 'https://open-vsx.org'),
+                    );
+                } else {
+                    this.registries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.Workspace, options));
+                }
             }
         }
 
