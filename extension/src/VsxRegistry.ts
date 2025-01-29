@@ -80,6 +80,10 @@ export class VsxRegistry implements Registry {
             decompress(filePath, extractedPath).then(resolve).catch(reject);
         });
 
+        // Copy the vsix file to be compatible with the NPM registry.
+        // TODO: Refactor logic to avoid copying the file.
+        await fspromises.copyFile(filePath, path.join(extractedPath, 'extension', path.basename(filePath)));
+
         return Uri.file(path.join(extractedPath, 'extension'));
     }
 

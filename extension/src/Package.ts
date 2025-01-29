@@ -280,7 +280,7 @@ export class Package {
 
         return {
             manifest: uriJoin(directory, 'package.json'),
-            vsix: vsix ? uriJoin(directory, vsix) : null,
+            vsix: vsix ? uriJoin(directory, path.basename(vsix)) : null,
             readme: await findFile(directory, README_GLOB),
             changelog: await findFile(directory, CHANGELOG_GLOB),
         };
