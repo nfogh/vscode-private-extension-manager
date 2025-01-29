@@ -145,7 +145,7 @@ suite('Registry Provider', function () {
         });
 
         const provider = new RegistryProvider(extensionInfo);
-        const type = 'Array<{ name: string, registry?: string }>';
+        const type = 'Array<{ name: string, registry?: string, type?: ("npm" | "vsx") }>';
 
         assert.throws(
             () => {
