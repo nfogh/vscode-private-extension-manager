@@ -2,13 +2,13 @@ import { assert } from 'chai';
 import * as inspector from 'inspector';
 import { before, after } from 'mocha';
 import * as nock from 'nock';
+import { SemVer } from 'semver';
 import * as vscode from 'vscode';
 
 import { VsxRegistry } from '../../VsxRegistry';
 import { SearchEntry, SearchResult, QueryEntry, QueryResult, VersionsResult } from '../../VsxRegistryTypes';
 
 import 'source-map-support/register';
-import { SemVer } from 'semver';
 
 const REGISTRY_URL = 'https://registry.local';
 

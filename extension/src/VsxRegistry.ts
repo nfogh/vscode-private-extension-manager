@@ -107,27 +107,44 @@ export class VsxRegistry implements Registry {
      * @param _token Token to use to cancel the search.
      */
     async getPackages(_token?: CancellationToken): Promise<Package[]> {
-        const reply = await fetch.default(`${this.registryUrl}/api/-/search?text=${this.query}`);
-        const searchResult = await reply.json();
+        let packages: Package[] = [];
 
-        const result = SearchResultRT.decode(searchResult);
+        let stop = false;
+        let from = 0;
+        while (!stop) {
+            const reply = await fetch.default(
+                `${this.registryUrl}/api/-/search?text=${this.query}&size=100&offset=${from}`,
+            );
+            const searchResult = await reply.json();
 
-        if (isLeft(result)) {
-            throw new Error(`Invalid response in getPackages ${PathReporter.report(result).join(',')}`);
+            const result = SearchResultRT.decode(searchResult);
+
+            if (isLeft(result)) {
+                throw new Error(`Invalid response in getPackages ${PathReporter.report(result).join(',')}`);
+            }
+            const typedResult: SearchResult = result.right;
+
+            if (typedResult.extensions.length === 0) {
+                stop = true;
+            }
+
+            const page = typedResult.extensions.map(
+                (entry) =>
+                    new Package(this, {
+                        name: entry.name,
+                        version: entry.version,
+                        displayName: entry.displayName,
+                        publisher: entry.namespace,
+                        description: entry.description,
+                        files: Object.values(entry.files),
+                    }),
+            );
+
+            packages = [...packages, ...page];
+            from = from + typedResult.extensions.length;
         }
-        const typedResult: SearchResult = result.right;
 
-        return typedResult.extensions.map(
-            (entry) =>
-                new Package(this, {
-                    name: entry.name,
-                    version: entry.version,
-                    displayName: entry.displayName,
-                    publisher: entry.namespace,
-                    description: entry.description,
-                    files: Object.values(entry.files),
-                }),
-        );
+        return packages;
     }
 
     /**
