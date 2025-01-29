@@ -17,9 +17,14 @@ function createFakeVSXServer(registryUrl: string): nock.Scope {
     mock.persist();
 
     mock.get('/api/-/search')
-        .query((query) => query.text === '')
+        .query((query) => query.text === '' && query.offset === '0')
         .reply(200, () => {
             return makeSearchResult([FOOEXTENSION, BAREXTENSION]);
+        });
+    mock.get('/api/-/search')
+        .query((query) => query.offset !== '0')
+        .reply(200, () => {
+            return makeSearchResult([]);
         });
 
     mock.get('/api/-/search')
