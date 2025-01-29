@@ -21,6 +21,15 @@ import {
     VersionsResultRT,
 } from './VsxRegistryTypes';
 
+async function pathAccessible(path: string) {
+    try {
+        await fspromises.access(path);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 /**
  * Represents a registry.
  */
@@ -65,24 +74,29 @@ export class VsxRegistry implements Registry {
 
         const dir = getNpmDownloadDir();
         const filePath = path.join(dir, path.basename(pkg.vsixFile));
-        await fspromises.mkdir(dir, { recursive: true });
-        const fileStream = fs.createWriteStream(filePath);
+        if (!(await pathAccessible(filePath))) {
+            await fspromises.mkdir(dir, { recursive: true });
+            const fileStream = fs.createWriteStream(filePath);
 
-        const data = await fetch.default(pkg.vsixFile);
-        await new Promise((resolve, reject) => {
-            data.body.pipe(fileStream);
-            data.body.on('error', reject);
-            fileStream.on('finish', resolve);
-        });
+            const data = await fetch.default(pkg.vsixFile);
+            await new Promise((resolve, reject) => {
+                data.body.pipe(fileStream);
+                data.body.on('error', reject);
+                fileStream.on('finish', resolve);
+            });
+        }
 
         const extractedPath = path.join(dir, path.basename(name)) + 'extracted';
-        await new Promise((resolve, reject) => {
-            decompress(filePath, extractedPath).then(resolve).catch(reject);
-        });
 
-        // Copy the vsix file to be compatible with the NPM registry.
-        // TODO: Refactor logic to avoid copying the file.
-        await fspromises.copyFile(filePath, path.join(extractedPath, 'extension', path.basename(filePath)));
+        if (!(await pathAccessible(extractedPath))) {
+            await new Promise((resolve, reject) => {
+                decompress(filePath, extractedPath).then(resolve).catch(reject);
+            });
+
+            // Copy the vsix file to be compatible with the NPM registry.
+            // TODO: Refactor logic to avoid copying the file.
+            await fspromises.copyFile(filePath, path.join(extractedPath, 'extension', path.basename(filePath)));
+        }
 
         return Uri.file(path.join(extractedPath, 'extension'));
     }
