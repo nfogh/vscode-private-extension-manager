@@ -9,6 +9,7 @@ import { SemVer } from 'semver';
 import { CancellationToken, Uri } from 'vscode';
 
 import { ExtensionInfoService } from './extensionInfo';
+import { getLogger } from './logger';
 import { Package } from './Package';
 import { Registry, RegistrySource, VersionInfo, VersionMissingError } from './Registry';
 import { getNpmDownloadDir } from './util';
@@ -112,15 +113,15 @@ export class VsxRegistry implements Registry {
         let stop = false;
         let from = 0;
         while (!stop) {
-            const reply = await fetch.default(
-                `${this.registryUrl}/api/-/search?text=${this.query}&size=100&offset=${from}`,
-            );
+            const query = `${this.registryUrl}/api/-/search?text=${this.query}&size=100&offset=${from}`;
+            const reply = await fetch.default(query);
             const searchResult = await reply.json();
 
             const result = SearchResultRT.decode(searchResult);
 
             if (isLeft(result)) {
-                throw new Error(`Invalid response in getPackages ${PathReporter.report(result).join(',')}`);
+                getLogger().log(`Invalid response to ${query}: ${PathReporter.report(result).join(',')}`);
+                throw new Error(`Invalid response from server. See output pane for details.`);
             }
             const typedResult: SearchResult = result.right;
 
@@ -164,13 +165,15 @@ export class VsxRegistry implements Registry {
      */
     async getPackageVersions(name: string): Promise<VersionInfo[]> {
         const [namespace, extension] = name.split('.');
-        const reply = await fetch.default(`${this.registryUrl}/api/${namespace}/${extension}/versions`);
+        const query = `${this.registryUrl}/api/${namespace}/${extension}/versions`;
+        const reply = await fetch.default(query);
         const versionsResult = await reply.json();
 
         const result = VersionsResultRT.decode(versionsResult);
 
         if (isLeft(result)) {
-            throw new Error(`Invalid response in getPackageVersions ${PathReporter.report(result).join(',')}`);
+            getLogger().log(`Invalid response to ${query}: ${PathReporter.report(result).join(',')}`);
+            throw new Error(`Invalid response from server. See output pane for details.`);
         }
         const typedResult: VersionsResult = result.right;
 
@@ -200,7 +203,8 @@ export class VsxRegistry implements Registry {
         const result = QueryResultRT.decode(queryResult);
 
         if (isLeft(result)) {
-            throw new Error(`Invalid response in getPackage ${PathReporter.report(result).join(',')}`);
+            getLogger().log(`Invalid response to ${query}: ${PathReporter.report(result).join(',')}`);
+            throw new Error(`Invalid response from server. See output pane for more info.`);
         }
         const typedResult: QueryResult = result.right;
 

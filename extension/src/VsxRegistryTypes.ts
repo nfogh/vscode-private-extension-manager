@@ -10,9 +10,9 @@ export const SearchEntryRT = options(
         namespace: t.string,
         version: t.string,
         timestamp: t.string,
-        verified: t.boolean,
     },
     {
+        verified: t.boolean,
         allVersionsUrl: t.string,
         averageRating: t.number,
         reviewCount: t.number,
@@ -93,11 +93,11 @@ export const QueryEntryRT = options(
         namespace: t.string,
         version: t.string,
         publishedBy: UserEntryRT,
-        verified: t.boolean,
         timestamp: t.string,
-        namespaceDisplayName: t.string,
     },
     {
+        namespaceDisplayName: t.string,
+        verified: t.boolean,
         success: t.string,
         warning: t.string,
         error: t.string,
@@ -143,11 +143,11 @@ export const QueryEntryRT = options(
 
 export const QueryResultRT = options(
     {
-        offset: t.number,
-        totalSize: t.number,
         extensions: t.array(QueryEntryRT),
     },
     {
+        offset: t.number,
+        totalSize: t.number,
         success: t.string,
         warning: t.string,
         error: t.string,
