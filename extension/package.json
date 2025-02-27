@@ -1,20 +1,20 @@
 {
-    "name": "private-extension-manager",
-    "displayName": "Private Extension Manager",
-    "description": "Manages extensions hosted in private NPM registries.",
+    "name": "private-extension-marketplace",
+    "displayName": "Private Extension Marketplace",
+    "description": "Manages extensions hosted in private NPM/OpenVSX registries.",
     "version": "1.9.0",
-    "publisher": "garmin",
+    "publisher": "nikolaj.fogh",
     "license": "Apache-2.0",
     "author": {
-        "name": "Garmin International"
+        "name": "Nikolaj Fogh"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/joelspadin-garmin/vscode-private-extension-manager.git",
+        "url": "https://github.com/nikolaj.fogh/vscode-private-extension-manager.git",
         "directory": "extension"
     },
     "engines": {
-        "vscode": "^1.63.0"
+        "vscode": "^1.72.0"
     },
     "extensionKind": [
         "workspace"
@@ -335,7 +335,7 @@
         "@types/sinon": "^10.0.6",
         "@types/source-map-support": "^0.5.3",
         "@types/valid-url": "^1.0.3",
-        "@types/vscode": "^1.63.0",
+        "@types/vscode": "1.72",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
         "@vscode/test-cli": "^0.0.10",

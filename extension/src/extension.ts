@@ -6,16 +6,11 @@ import * as commands from './commands/index';
 import { setContext } from './context';
 import { ExtensionInfoService } from './extensionInfo';
 import { ExtensionsFileFeatures } from './extensionsFileFeatures';
+import { RecommendedExtensionPrompter } from './RecommendedExtensionPrompter';
 import { RegistryProvider } from './RegistryProvider';
 import { UpdateChecker } from './UpdateChecker';
 import { deleteNpmDownloads } from './util';
 import { RegistryView } from './views/registryView';
-
-// TODO: notify user if extensions.private.json recommends extensions that are
-// not installed. Add a way to ignore for a workspace or disable globally.
-
-// TODO: If https://github.com/Microsoft/vscode/issues/62783 is ever implemented,
-// display a badge with the number of updates on the activity bar icon.
 
 nls.config({ messageFormat: nls.MessageFormat.file })();
 
@@ -26,6 +21,9 @@ export function activate(context: vscode.ExtensionContext): void {
     const registryProvider = new RegistryProvider(extensionInfo);
     const registryView = new RegistryView(registryProvider, extensionInfo);
     const updateChecker = new UpdateChecker(registryProvider, extensionInfo);
+    const recommendedExtensionPrompter = new RecommendedExtensionPrompter(registryProvider, () => {
+        return new Set(vscode.extensions.all.map((ext) => ext.id));
+    });
 
     context.subscriptions.push(
         extensionInfo,
@@ -34,6 +32,7 @@ export function activate(context: vscode.ExtensionContext): void {
         updateChecker,
         registerCommands(registryProvider, registryView, updateChecker, extensionInfo),
         registerLanguageFeatures(registryProvider),
+        recommendedExtensionPrompter,
     );
 }
 

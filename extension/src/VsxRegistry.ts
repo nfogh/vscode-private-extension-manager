@@ -145,6 +145,8 @@ export class VsxRegistry implements Registry {
             from = from + typedResult.extensions.length;
         }
 
+        await Promise.all(packages.map((pkg) => pkg.updateState()));
+
         return packages;
     }
 
@@ -154,10 +156,8 @@ export class VsxRegistry implements Registry {
      * This is a dictionary with channel names as keys and the latest version
      * in each channel as values.
      */
-    async getPackageChannels(name: string): Promise<Record<string, VersionInfo>> {
-        const versions = await this.getPackageVersions(name);
-        versions.sort((a, b) => b.version.compare(a.version));
-        return { release: versions[0] };
+    async getPackageChannels(_name: string): Promise<Record<string, VersionInfo>> {
+        return {};
     }
 
     /**

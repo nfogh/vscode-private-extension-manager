@@ -113,12 +113,6 @@ suite('VSX Registry Package Search', function () {
         assert.equal(versions.length, 2);
         assert.containSubset(versions, [{ version: new SemVer('1.0.1') }, { version: new SemVer('1.0.0') }]);
     });
-
-    test('getPackageChannels shall return latest version for release and prerelease channels', async function () {
-        const registry = new VsxRegistry('FakeRegistry', 'unknown', REGISTRY_URL);
-        const channels = await registry.getPackageChannels('baz.foo');
-        assert.containSubset(channels, { release: { version: new SemVer('1.0.1') } });
-    });
 });
 
 /**

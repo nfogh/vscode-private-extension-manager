@@ -2,7 +2,10 @@
 
 ## 1.9.0
 
--   Added support for vsx repositories
+-   Added support for OpenVSX repositories.
+-   Make a popup for recommended private extensions, similar to how vscode does it.
+-   Changed name to private-extension-marketplace to avoid clashes with joels extension.
+-   Show a badge with the number of updatable extensions
 
 ## 1.8.0
 

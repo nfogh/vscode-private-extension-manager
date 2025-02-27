@@ -61,6 +61,7 @@ export class RegistryView implements Disposable {
             this.extensionsProvider,
             this.recommendedProvider,
             this.extensionView,
+            this.startBadgeUpdater(extensionsTree),
         );
 
         setImmediate(() => this.refresh());
@@ -68,6 +69,18 @@ export class RegistryView implements Disposable {
 
     public dispose(): void {
         this.disposable.dispose();
+    }
+
+    private startBadgeUpdater(extensionsTree: vscode.TreeView<Element>): Disposable {
+        return this.registryProvider.onDidChangeRegistries(() => {
+            this.registryProvider.getUniquePackages().then((pkgs) => {
+                const packagesWithUpdates = pkgs.filter((pkg) => pkg.isUpdateAvailable);
+                extensionsTree.badge = {
+                    value: packagesWithUpdates.length,
+                    tooltip: packagesWithUpdates.length > 0 ? 'Updates available' : 'No updates available',
+                };
+            });
+        });
     }
 
     /**
@@ -277,7 +290,7 @@ class ExtensionItem extends BaseItem {
         if (this.pkg.isUpdateAvailable && this.pkg.installedVersion) {
             return `${this.pkg.installedVersion} → ${this.pkg.version}`;
         } else {
-            return this.pkg.version.toString();
+            return this.pkg.description.toString();
         }
     }
 
