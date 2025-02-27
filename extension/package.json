@@ -3,7 +3,7 @@
     "displayName": "Private Extension Marketplace",
     "description": "Manages extensions hosted in private NPM/OpenVSX registries.",
     "version": "1.9.0",
-    "publisher": "nikolaj.fogh",
+    "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
         "name": "Nikolaj Fogh"
