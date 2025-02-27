@@ -6,13 +6,13 @@
 const fs = require('fs');
 const glob = require('glob');
 const path = require('path');
-const template = require('lodash.template');
+const Eta = require('eta');
 const IgnorePlugin = require('webpack').IgnorePlugin;
 const NormalModuleReplacementPlugin = require('webpack').NormalModuleReplacementPlugin;
 const LicenseCheckerWebpackPlugin = require('license-checker-webpack-plugin');
 
 // See https://spdx.org/licenses/
-const allowedLicenses = ['Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC-BY-3.0+', 'CC0-1.0', 'ISC', 'MIT', 'WTFPL'];
+const allowedLicenses = ['Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC-BY-3.0+', 'CC0-1.0', 'ISC', 'MIT', 'WTFPL', 'BlueOak-1.0.0'];
 
 /** @type {import('webpack').Configuration} */
 const extensionConfig = {
@@ -63,6 +63,7 @@ const extensionConfig = {
         ),
         // Write a file containing all third-party license information.
         new LicenseCheckerWebpackPlugin({
+            filter: /(^.*[/\\]node_modules[/\\]((?:@[^/\\]+[/\\])?(?:[^@/\\][^/\\]*)))/,
             allow: `(${allowedLicenses.join(' OR ')})`,
             outputFilename: 'ThirdPartyNotices.txt',
             emitError: true,
@@ -117,11 +118,10 @@ module.exports = [extensionConfig, webviewConfig];
  * @param {{ dependencies: LicenseCheckerWebpackPlugin.Dependency[] }} dependencies
  */
 function writeThirdPartyNotices({ dependencies }) {
-    const templateFile = path.resolve(__dirname, './src/thirdPartyNotices.ejs');
-    const writer = template(fs.readFileSync(templateFile, { encoding: 'utf8' }));
+    const eta = new Eta.Eta({ views: path.join(__dirname, "src") });
 
     const extraLicenseFiles = glob.sync('licenses/**', { nodir: true });
     const extraLicenses = extraLicenseFiles.map((file) => fs.readFileSync(file, { encoding: 'utf8' }));
 
-    return writer({ dependencies, extraLicenses });
+    return eta.render("./thirdPartyNotices.ejs", { dependencies, extraLicenses });
 }
