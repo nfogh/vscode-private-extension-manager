@@ -9,10 +9,10 @@ const path = require('path');
 const Eta = require('eta');
 const IgnorePlugin = require('webpack').IgnorePlugin;
 const NormalModuleReplacementPlugin = require('webpack').NormalModuleReplacementPlugin;
-const LicenseCheckerWebpackPlugin = require('license-checker-webpack-plugin');
+const LicensePlugin = require('webpack-license-plugin');
 
 // See https://spdx.org/licenses/
-const allowedLicenses = ['Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC-BY-3.0+', 'CC0-1.0', 'ISC', 'MIT', 'WTFPL', 'BlueOak-1.0.0'];
+const allowedLicenses = ['Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC-BY-3.0', 'CC0-1.0', 'ISC', 'MIT', 'WTFPL', 'WTFPL OR ISC', 'BlueOak-1.0.0'];
 
 /** @type {import('webpack').Configuration} */
 const extensionConfig = {
@@ -62,15 +62,16 @@ const extensionConfig = {
             path.resolve(__dirname, 'src/stubs/@npmcli/run-script.js'),
         ),
         // Write a file containing all third-party license information.
-        new LicenseCheckerWebpackPlugin({
-            filter: /(^.*[/\\]node_modules[/\\]((?:@[^/\\]+[/\\])?(?:[^@/\\][^/\\]*)))/,
-            allow: `(${allowedLicenses.join(' OR ')})`,
-            outputFilename: 'ThirdPartyNotices.txt',
-            emitError: true,
-            override: {
-                'valid-url@1.0.9': { licenseName: 'MIT' }, // https://github.com/ogt/valid-url/blob/master/LICENSE
+        new LicensePlugin({
+            licenseOverrides: {
+                'valid-url@1.0.9': 'MIT'
             },
-            outputWriter: writeThirdPartyNotices,
+            unacceptableLicenseTest: (licenseIdentifier) => {
+                return !allowedLicenses.includes(licenseIdentifier);
+            },
+            additionalFiles: {
+                'thirdPartyNotices.txt': writeThirdPartyNotices
+            }
         }),
     ],
 };
@@ -111,13 +112,10 @@ const webviewConfig = {
 module.exports = [extensionConfig, webviewConfig];
 
 /**
- * Like LicenseCheckerWebpackPlugin's default output writer, but also appends
- * all the files in the `licenses` directory so we include licenses for media
- * and other resources that aren't an explicit package dependency.
- *
- * @param {{ dependencies: LicenseCheckerWebpackPlugin.Dependency[] }} dependencies
+ * Appends all the files in the `licenses` directory so we include licenses for
+ * media and other resources that aren't an explicit package dependency.
  */
-function writeThirdPartyNotices({ dependencies }) {
+function writeThirdPartyNotices(dependencies) {
     const eta = new Eta.Eta({ views: path.join(__dirname, "src") });
 
     const extraLicenseFiles = glob.sync('licenses/**', { nodir: true });

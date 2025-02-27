@@ -5,7 +5,7 @@ Do Not Translate or Localize
 --------------------------------------------------------------------------------
 <%= dep.name %> v<%= dep.version %><%= dep.author ? ` - ${dep.author}` : '' %><%= dep.repository ? `\n${dep.repository}` : '' %>
 --------------------------------------------------------------------------------
-<%= dep.licenseText || dep.licenseName %>
+<%= dep.licenseText || dep.license %>
 <% }) %>
 
 <% it.extraLicenses.forEach(license => { %>
