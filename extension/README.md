@@ -1,11 +1,11 @@
-# Private Extension Manager
+# Private Extension Marketplace
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-Private Extension Manager lets you find, install, and update extensions from any
+Private Extension Marketplace lets you find, install, and update extensions from any
 NPM or VSX registry. This lets you distribute organization-specific extensions using a
 private NPM registry server such as [Sonatype Nexus](https://www.sonatype.com/product-nexus-repository)
-or [Verdaccio](https://verdaccio.org). Or using an openVSX instance.
+or [Verdaccio](https://verdaccio.org). Or using an [OpenVSX](https://github.com/eclipse/openvsx) instance.
 
 # Managing Extensions
 
@@ -24,7 +24,7 @@ you can use it.
 
 ## Publishing Extensions (NPM registry)
 
-To allow Private Extension Manager to find your extension,
+To allow Private Extension Marketplace to find your extension,
 [package it in the VSIX format using vsce](https://code.visualstudio.com/api/working-with-extensions/publishing-extension),
 create an NPM package containing the .vsix file, and publish it to an NPM
 registry. Your extension's `package.json` must contain a `files` array with the
@@ -32,7 +32,7 @@ path to the .vsix file so the extension manager knows what to install. Use
 `vsce package` in a [`prepublishOnly` script](https://docs.npmjs.com/misc/scripts)
 to ensure that your NPM packages always contain an up-to-date extension package.
 
-Note that when Private Extension Manager displays the details for an extension,
+Note that when Private Extension Marketplace displays the details for an extension,
 it will unpack the latest version of the NPM package to read its README and
 CHANGELOG files, but it will not unpack the .vsix file. If your extension has an
 icon, ensure that it is either accessible via HTTPS or included directly in your
@@ -118,17 +118,17 @@ unsupported platforms.
 
 ## OpenVSX repositories
 
-For Open VSX repositories, follow the guides found in the Open VSX pages.
+For Open VSX repositories, follow the guides found in the [Open VSX pages](https://github.com/eclipse/openvsx/wiki/Deploying-Open-VSX) to install an OpenVSX server.
 
 ## Discovering Extensions
 
 Now that your extensions are published to an NPM or OpenVSX registry, you need to tell
-Private Extension Manager how to find them. This can be done using a workspace
+Private Extension Marketplace how to find them. This can be done using a workspace
 config file and/or a user setting.
 
 ### Workspace Configuration
 
-Private Extension Manager uses a config file similar to Visual Studio Code's
+Private Extension Marketplace uses a config file similar to Visual Studio Code's
 `extensions.json` to allow workspaces to recommend extensions. Create a file
 named `.vscode/extensions.private.json` in any workspace folder to define your
 private extension registries and any recommended extensions. You can use the
@@ -136,7 +136,7 @@ private extension registries and any recommended extensions. You can use the
 **Private Extensions: Configure Workspace Registries** commands to open this
 file, creating it from a template if it does not already exist.
 
-The file has the following structure:
+The file has the following structure (for an npm registry):
 
 ```JSON
 {
@@ -153,12 +153,14 @@ The file has the following structure:
 }
 ```
 
+For an OpenVSX registry, use the type "vsx".
+
 The `registries` array defines one or more registries to search for private
 extensions. Each item supports the following fields:
 
 -   **name**: Name to display for the registry.
--   **registry**: (Optional) The address of the NPM registry which contains the extension packages.
-    If omitted, the registry is determined according to standard [NPM config files](https://docs.npmjs.com/files/npmrc).
+-   **registry**: (Optional) The address of the registry which contains the extension packages.
+    If omitted, the registry is determined according to standard [NPM config files](https://docs.npmjs.com/files/npmrc), or in the case of a VSX registry, it will use [OpenVSX](https://open-vsx.org/)
 -   **query**: (Optional) Display only packages that match this [search query](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#get-v1search).
     This is either an array of search terms or a string with space-delimited terms.
     For example, `"keywords:group1 keywords:group2"` would display only packages
@@ -196,10 +198,10 @@ You can use the **Private Extensions: Add Registry...** and
 
 ### Custom Channels
 
-It is possible to create tracking channels by using npm dist-tags when
-publishing a private extension. This lets you publish pre-release or other
-special versions of an extension without updating all users to them. Only users
-who are tracking the specific release channel will get the updates.
+For NPM registries, it is possible to create tracking channels by using npm
+dist-tags when publishing a private extension. This lets you publish pre-release
+or other special versions of an extension without updating all users to them.
+Only users who are tracking the specific release channel will get the updates.
 
 #### Tracking a Channel
 
@@ -221,7 +223,7 @@ the example below:
 ```
 
 You can also pin an extension to a specific version by listing the version
-instead of a dist-tag. Private Extension Manager will not notify you of updates
+instead of a dist-tag. Private Extension Marketplace will not notify you of updates
 to a pinned extension, so you can use this to temporarily ignore newer versions
 of an extension.
 
@@ -240,7 +242,7 @@ sematic versioning, such as **1.0.0-beta.0**.
 
 ## Extension Updates
 
-Private Extension Manager will periodically check your installed extensions for
+Private Extension Marketplace will periodically check your installed extensions for
 updates and notify you if any are found. You can adjust the check interval or
 disable it with the `privateExtensions.updateCheckInterval` setting.
 
@@ -254,10 +256,10 @@ to take effect.
 
 When using a [remote development](https://code.visualstudio.com/docs/remote/remote-overview)
 extension such as [Remote-SSH](https://code.visualstudio.com/docs/remote/ssh),
-install the [Private Extension Manager: Remote Helper](https://marketplace.visualstudio.com/items?itemName=Garmin.private-extension-manager-remote-helper)
-extension to give Private Extension Manager access to the local machine.
+install the [Private Extension Marketplace: Remote Helper](https://marketplace.visualstudio.com/items?itemName=Garmin.private-extension-manager-remote-helper)
+extension to give Private Extension Marketplace access to the local machine.
 
-Private Extension Manager will attempt to infer where VS Code will install an
+Private Extension Marketplace will attempt to infer where VS Code will install an
 extension. If it shows "Install Locally" for a workspace extension or vice versa,
 [set the `extensionKind` property](https://code.visualstudio.com/api/advanced-topics/remote-extensions#incorrect-execution-location)
 in your extension's `package.json` to tell both VS Code and Private Extension
@@ -267,7 +269,7 @@ Manager where the extension should be installed.
 
 If you are successfully connecting to a private registry and don't see any
 errors, but you don't see any extensions either, first open the Output panel
-(Ctrl+Shift+U) and check the dropdown list for "Private Extension Manager".
+(Ctrl+Shift+U) and check the dropdown list for "Private Extension Marketplace".
 If it is present, it may contain information as to why extension packages are
 being discarded.
 
