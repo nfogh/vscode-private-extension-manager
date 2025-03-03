@@ -24,18 +24,16 @@ export class RecommendedExtensionPrompter implements vscode.Disposable {
         const allLocallyInstalledExtensions = this.installedExtensionsProvider();
         const noLocalExtensions = extensions.filter((ext) => !allLocallyInstalledExtensions.has(ext));
 
-        const noExtensions = (
-            await Promise.all(
-                noLocalExtensions.map(async (ext) => {
-                    return {
-                        name: ext,
-                        installed: await this.isInstalledRemote(ext),
-                    };
-                }),
-            )
-        )
-            .filter((ext) => !ext.installed)
-            .map((ext) => ext.name);
+        const remoteExtensionInstallInfo = await Promise.all(
+            noLocalExtensions.map(async (ext) => {
+                return {
+                    name: ext,
+                    installed: await this.isInstalledRemote(ext),
+                };
+            }),
+        );
+
+        const noExtensions = remoteExtensionInstallInfo.filter((ext) => !ext.installed).map((ext) => ext.name);
 
         return noExtensions;
     }
