@@ -42,11 +42,11 @@ export class VsxRegistry implements Registry {
     readonly source: RegistrySource;
     readonly registryUrl: string;
 
-    constructor(name: string, query: string | string[], registryUrl: string) {
+    constructor(extensionInfo: ExtensionInfoService, name: string, query: string | string[], registryUrl: string) {
         this.query = query;
         this.enablePagination = true;
         this.registryUrl = registryUrl;
-        this.extensionInfo = new ExtensionInfoService();
+        this.extensionInfo = extensionInfo;
         this.name = name;
         this.source = RegistrySource.User;
     }

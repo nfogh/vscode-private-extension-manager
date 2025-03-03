@@ -1,14 +1,12 @@
-import * as fs from 'fs';
+import * as fssync from 'fs';
+import * as fs from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import memoizeOne from 'memoize-one';
 import * as path from 'path';
-import rimraf = require('rimraf');
-import { promisify } from 'util';
+import * as rimraf from 'rimraf';
 import { Uri, workspace, WorkspaceConfiguration } from 'vscode';
 
 import { context } from './context';
-
-const readFile = promisify(fs.readFile);
 
 export function getConfig(): WorkspaceConfiguration {
     return workspace.getConfiguration('privateExtensions');
@@ -41,7 +39,7 @@ export function getNpmDownloadDir(): string {
  */
 export async function deleteNpmDownloads(): Promise<void> {
     const downloadDir = getNpmDownloadDir();
-    await rimrafPromise(downloadDir);
+    await rimraf.rimraf(downloadDir);
 }
 
 /**
@@ -72,7 +70,7 @@ export function memoize(_target: unknown, _key: string, descriptor: PropertyDesc
 export async function readJSON(file: string | Uri): Promise<any> {
     file = file instanceof Uri ? file.fsPath : file;
 
-    const text = await readFile(file, 'utf8');
+    const text = await fs.readFile(file, 'utf8');
     return jsonc.parse(text);
 }
 
@@ -85,20 +83,8 @@ export async function readJSON(file: string | Uri): Promise<any> {
 export function readJSONSync(file: string | Uri): any {
     file = file instanceof Uri ? file.fsPath : file;
 
-    const text = fs.readFileSync(file, 'utf8');
+    const text = fssync.readFileSync(file, 'utf8');
     return jsonc.parse(text);
-}
-
-export function rimrafPromise(path: string, options?: rimraf.Options): Promise<void> {
-    return new Promise((resolve, reject) => {
-        rimraf(path, options ?? {}, (err) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
-    });
 }
 
 /**

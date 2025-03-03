@@ -1,10 +1,11 @@
 import cacache = require('cacache');
+import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
 import { Command } from '../commandManager';
 import { getLogger } from '../logger';
-import { getNpmCacheDir, rimrafPromise } from '../util';
+import { getNpmCacheDir } from '../util';
 
 const localize = nls.loadMessageBundle();
 
@@ -25,7 +26,7 @@ export class DeleteCacheCommand implements Command {
                 location: vscode.ProgressLocation.Notification,
             },
             async () => {
-                await rimrafPromise(cache);
+                await rimraf.rimraf(cache);
                 getLogger().log(`Deleted NPM cache: ${cache}`);
             },
         );

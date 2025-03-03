@@ -199,7 +199,12 @@ export class RegistryProvider implements Disposable {
             const { name, type, ...options } = item;
             if (type === 'vsx') {
                 this.userRegistries.push(
-                    new VsxRegistry(name, RegistrySource.User, item.registry ?? 'https://open-vsx.org'),
+                    new VsxRegistry(
+                        this.extensionInfo,
+                        name,
+                        RegistrySource.User,
+                        item.registry ?? 'https://open-vsx.org',
+                    ),
                 );
             } else {
                 this.userRegistries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.User, options));
@@ -348,7 +353,12 @@ class FolderRegistryProvider implements Disposable {
 
                 if (type === 'vsx') {
                     this.registries.push(
-                        new VsxRegistry(name, RegistrySource.Workspace, registry.registry ?? 'https://open-vsx.org'),
+                        new VsxRegistry(
+                            this.extensionInfo,
+                            name,
+                            RegistrySource.Workspace,
+                            registry.registry ?? 'https://open-vsx.org',
+                        ),
                     );
                 } else {
                     this.registries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.Workspace, options));

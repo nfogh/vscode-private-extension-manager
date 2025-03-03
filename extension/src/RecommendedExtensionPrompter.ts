@@ -3,13 +3,46 @@ import * as vscode from 'vscode';
 import * as install from './install';
 import { RegistryProvider } from './RegistryProvider';
 
+interface RemoteHelperExtensionInfo {
+    id: string;
+    extensionKind: vscode.ExtensionKind;
+    packageJSON: any;
+}
+
 export class RecommendedExtensionPrompter implements vscode.Disposable {
     private readonly disposable: vscode.Disposable;
 
+    public async isInstalledRemote(extension: string): Promise<boolean> {
+        const extensionInfo = await vscode.commands.executeCommand<RemoteHelperExtensionInfo>(
+            '_privateExtensionManager.remoteHelper.getExtension',
+            extension,
+        );
+        return extensionInfo !== undefined;
+    }
+
+    public async removeInstalledExtensions(extensions: string[]): Promise<string[]> {
+        const allLocallyInstalledExtensions = this.installedExtensionsProvider();
+        const noLocalExtensions = extensions.filter((ext) => !allLocallyInstalledExtensions.has(ext));
+
+        const noExtensions = (
+            await Promise.all(
+                noLocalExtensions.map(async (ext) => {
+                    return {
+                        name: ext,
+                        installed: await this.isInstalledRemote(ext),
+                    };
+                }),
+            )
+        )
+            .filter((ext) => !ext.installed)
+            .map((ext) => ext.name);
+
+        return noExtensions;
+    }
+
     public async configurationChanged() {
-        const recommendedExtensions = this.registryProvider.getRecommendedExtensions();
-        const allExtensions = this.installedExtensionsProvider();
-        const recommendedButNotInstalled = [...recommendedExtensions].filter((ext) => !allExtensions.has(ext));
+        const recommendedExtensions = [...this.registryProvider.getRecommendedExtensions()];
+        const recommendedButNotInstalled = await this.removeInstalledExtensions(recommendedExtensions);
         if (recommendedButNotInstalled.length > 0) {
             const reply = await vscode.window.showInformationMessage(
                 `Do you want to install the recommended extensions ${recommendedButNotInstalled.join(

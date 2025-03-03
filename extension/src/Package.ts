@@ -1,9 +1,8 @@
-import * as _glob from 'glob';
+import * as glob from 'glob';
 import * as t from 'io-ts';
 import * as os from 'os';
 import * as path from 'path';
 import { gt, parse as parseVersion, SemVer } from 'semver';
-import { promisify } from 'util';
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
@@ -15,7 +14,6 @@ import { isNonEmptyArray, formatExtensionId } from './util';
 const README_GLOB = 'README?(.*)';
 const CHANGELOG_GLOB = 'CHANGELOG?(.*)';
 
-const glob = promisify(_glob);
 const localize = nls.loadMessageBundle();
 
 export enum PackageState {
@@ -332,7 +330,7 @@ function findVsixFile(manifest: PackageManifest): Result<string> {
  * Returns the first file found, or null if no file was found.
  */
 async function findFile(directory: vscode.Uri, pattern: string) {
-    const results = await glob(pattern, {
+    const results = await glob.glob(pattern, {
         cwd: directory.fsPath,
         nocase: true,
     });

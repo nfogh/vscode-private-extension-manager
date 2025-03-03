@@ -1,6 +1,6 @@
 import { assert, use } from 'chai';
 import chaiSubset = require('chai-subset');
-import * as chaiSubsetInOrder from 'chai-subset-in-order';
+import chaiSubsetInOrder = require('chai-subset-in-order');
 import * as search from 'libnpmsearch';
 import { after, afterEach, before, beforeEach } from 'mocha';
 import * as nock from 'nock';
