@@ -1,7 +1,7 @@
 # Private Extension Manager for Visual Studio Code
 
-![build status: extension](https://github.com/joelspadin-garmin/vscode-private-extension-manager/workflows/Node%20CI%20(extension)/badge.svg)
-![build status: remote-helper](https://github.com/joelspadin-garmin/vscode-private-extension-manager/workflows/Node%20CI%20(remote-helper)/badge.svg)
+![build status](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/main.yml/badge.svg)
+![publish status](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/publish.yml/badge.svg)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 Private Extension Manager is a Visual Studio Code extension that lets you find,
