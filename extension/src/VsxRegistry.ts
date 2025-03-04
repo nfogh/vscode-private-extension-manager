@@ -73,10 +73,10 @@ export class VsxRegistry implements Registry {
             throw new Error(`No VSIX file found for ${name}@${version}`);
         }
 
-        const dir = getNpmDownloadDir();
-        const filePath = path.join(dir, path.basename(pkg.vsixFile));
+        const downloadDir = getNpmDownloadDir();
+        const filePath = path.join(downloadDir, path.basename(pkg.vsixFile));
         if (!(await pathAccessible(filePath))) {
-            await fspromises.mkdir(dir, { recursive: true });
+            await fspromises.mkdir(downloadDir, { recursive: true });
             const fileStream = fs.createWriteStream(filePath);
 
             const data = await fetch.default(pkg.vsixFile);
@@ -87,7 +87,7 @@ export class VsxRegistry implements Registry {
             });
         }
 
-        const extractedPath = path.join(dir, path.basename(name)) + 'extracted';
+        const extractedPath = filePath + '-extracted';
 
         if (!(await pathAccessible(extractedPath))) {
             await new Promise((resolve, reject) => {

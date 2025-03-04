@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.9.2
+
+-   Fix updating of OpenVSX registry packages
+
+## 1.9.1
+
+-   Fix recommended extension notifier for remote workspaces
+
 ## 1.9.0
 
 -   Added support for OpenVSX repositories.
