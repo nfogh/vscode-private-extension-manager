@@ -7,11 +7,15 @@ on:
 name: Deploy Extension
 jobs:
   deploy:
+    strategy:
+      matrix:
+        extension: [extension, remote-helper]
+        
     runs-on: ubuntu-latest
     environment: production
     defaults:
       run:
-          working-directory: extension
+          working-directory: ${{ matrix.extension }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,17 +32,17 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: npm test
-          working-directory: extension
+          working-directory: ${{ matrix.extension }}
 
       - name: Publish to Open VSX Registry
         uses: HaaLeo/publish-vscode-extension@v2
         with:
-          packagepath: extension
+          packagepath: ${{ matrix.extension }}
           pat: ${{ secrets.OPEN_VSX_TOKEN }}
 
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v2
         with:
-          packagepath: extension
+          packagepath: ${{ matrix.extension }}
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
