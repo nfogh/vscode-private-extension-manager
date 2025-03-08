@@ -1,20 +1,20 @@
 {
-    "name": "private-extension-manager-remote-helper",
-    "displayName": "Private Extension Manager: Remote Helper",
-    "description": "Lets Private Extension Manager work in remote workspaces.",
-    "version": "1.8.0",
-    "publisher": "garmin",
+    "name": "private-extension-marketplace-remote-helper",
+    "displayName": "Private Extension Marketplace: Remote Helper",
+    "description": "Lets Private Extension Marketplace work in remote workspaces.",
+    "version": "1.9.4",
+    "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
-        "name": "Garmin International"
+        "name": "Nikolaj Fogh"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/joelspadin-garmin/vscode-private-extension-manager.git",
+        "url": "https://github.com/nikolaj.fogh/vscode-private-extension-manager.git",
         "directory": "remote-helper"
     },
     "engines": {
-        "vscode": "^1.63.0"
+        "vscode": "^1.77.0"
     },
     "extensionKind": [
         "ui"
@@ -28,8 +28,8 @@
         "remote"
     ],
     "activationEvents": [
-        "onCommand:_privateExtensionManager.remoteHelper.getExtension",
-        "onCommand:_privateExtensionManager.remoteHelper.getPlatform"
+        "onCommand:_privateExtensionMarketplace.remoteHelper.getExtension",
+        "onCommand:_privateExtensionMarketplace.remoteHelper.getPlatform"
     ],
     "main": "./dist/extension.js",
     "scripts": {
@@ -52,6 +52,8 @@
         "@types/vscode": "^1.63.0",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
+        "@vscode/test-electron": "^2.4.1",
+        "@vscode/vsce": "^3.2.2",
         "eslint": "^8.4.1",
         "eslint-config-prettier": "^8.1.0",
         "eslint-import-resolver-typescript": "^2.5.0",
@@ -73,9 +75,5 @@
         "tabWidth": 4,
         "printWidth": 120,
         "endOfLine": "auto"
-    },
-    "dependencies": {
-        "@vscode/test-electron": "^2.4.1",
-        "@vscode/vsce": "^3.2.2"
     }
 }

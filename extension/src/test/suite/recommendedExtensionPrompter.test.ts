@@ -27,7 +27,7 @@ suite('RecommendedExtensionPrompter', function () {
         const showInformationMessageFake = sinon.stub(vscode.window, 'showInformationMessage');
 
         runCommandFake.callsFake(async (command, arg) => {
-            if (command === '_privateExtensionManager.remoteHelper.getExtension') {
+            if (command === '_privateExtensionMarketplace.remoteHelper.getExtension') {
                 if (arg === installedExtension2) {
                     return {
                         id: installedExtension2,

@@ -3,8 +3,8 @@ import { before } from 'mocha';
 import 'source-map-support/register';
 import * as vscode from 'vscode';
 
-const EXTENSION_NAME = 'private-extension-manager-remote-helper';
-const PUBLISHER_ID = 'garmin';
+const EXTENSION_NAME = 'private-extension-marketplace-remote-helper';
+const PUBLISHER_ID = 'NikolajFogh';
 const EXTENSION_ID = `${PUBLISHER_ID}.${EXTENSION_NAME}`;
 
 suite('Extension Test Suite', function () {
@@ -24,21 +24,21 @@ suite('Extension Test Suite', function () {
 
     test('Get Package JSON', async function () {
         const extension = await vscode.commands.executeCommand<Partial<vscode.Extension<any>>>(
-            '_privateExtensionManager.remoteHelper.getExtension',
+            '_privateExtensionMarketplace.remoteHelper.getExtension',
             EXTENSION_ID,
         );
 
         assert.notStrictEqual(extension, undefined);
-        assert.strictEqual(extension?.id?.toLowerCase(), EXTENSION_ID);
+        assert.strictEqual(extension?.id?.toLowerCase(), EXTENSION_ID.toLowerCase());
         assert.strictEqual(extension?.extensionKind, vscode.ExtensionKind.UI);
-        assert.strictEqual(extension?.packageJSON.name, EXTENSION_NAME);
+        assert.strictEqual(extension?.packageJSON.name.toLowerCase(), EXTENSION_NAME);
         assert.strictEqual(extension?.packageJSON.publisher, PUBLISHER_ID);
         assert.strictEqual(typeof extension?.packageJSON.version, 'string');
     });
 
     test('Get Platform', async function () {
         const platform = await vscode.commands.executeCommand<string>(
-            '_privateExtensionManager.remoteHelper.getPlatform',
+            '_privateExtensionMarketplace.remoteHelper.getPlatform',
         );
 
         assert.strictEqual(platform, process.platform);

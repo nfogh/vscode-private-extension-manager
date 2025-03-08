@@ -2,7 +2,7 @@
     "name": "private-extension-marketplace",
     "displayName": "Private Extension Marketplace",
     "description": "Manages extensions hosted in private NPM/OpenVSX registries.",
-    "version": "1.9.2",
+    "version": "1.9.4",
     "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
@@ -20,7 +20,7 @@
         "workspace"
     ],
     "extensionPack": [
-        "garmin.private-extension-manager-remote-helper"
+        "NikolajFogh.private-extension-marketplace-remote-helper"
     ],
     "icon": "media/icon.png",
     "categories": [

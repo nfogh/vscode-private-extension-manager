@@ -62,7 +62,7 @@ export class ExtensionInfoService implements vscode.Disposable {
 
         try {
             context.subscriptions.push(
-                vscode.commands.registerCommand('_privateExtensionManager.notifyExtensionsChanged', () =>
+                vscode.commands.registerCommand('_privateExtensionMarketplace.notifyExtensionsChanged', () =>
                     this._onDidChangeOtherExtension.fire(),
                 ),
             );
@@ -241,7 +241,7 @@ export class ExtensionInfoService implements vscode.Disposable {
         if (vscode.env.remoteName) {
             try {
                 const uiExtension = await vscode.commands.executeCommand<RemoteHelperExtensionInfo>(
-                    '_privateExtensionManager.remoteHelper.getExtension',
+                    '_privateExtensionMarketplace.remoteHelper.getExtension',
                     extensionId,
                 );
 

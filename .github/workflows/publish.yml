@@ -30,6 +30,12 @@ jobs:
           run: npm test
           working-directory: extension
 
+      - name: Publish to Open VSX Registry
+        uses: HaaLeo/publish-vscode-extension@v2
+        with:
+          packagepath: extension
+          pat: ${{ secrets.OPEN_VSX_TOKEN }}
+
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v2
         with:

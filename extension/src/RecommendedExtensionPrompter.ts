@@ -14,7 +14,7 @@ export class RecommendedExtensionPrompter implements vscode.Disposable {
 
     public async isInstalledRemote(extension: string): Promise<boolean> {
         const extensionInfo = await vscode.commands.executeCommand<RemoteHelperExtensionInfo>(
-            '_privateExtensionManager.remoteHelper.getExtension',
+            '_privateExtensionMarketplace.remoteHelper.getExtension',
             extension,
         );
         return extensionInfo !== undefined;

@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.9.3
+
+-   Publish private-extension-marketplace-remote-helper
+
 ## 1.9.2
 
 -   Fix updating of OpenVSX registry packages

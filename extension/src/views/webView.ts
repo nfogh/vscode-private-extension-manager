@@ -189,7 +189,7 @@ async function getUiPlatform(): Promise<NodeJS.Platform> {
     if (vscode.env.remoteName) {
         try {
             const uiPlatform = await vscode.commands.executeCommand<NodeJS.Platform>(
-                '_privateExtensionManager.remoteHelper.getPlatform',
+                '_privateExtensionMarketplace.remoteHelper.getPlatform',
             );
 
             if (uiPlatform) {
