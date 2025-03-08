@@ -1,5 +1,5 @@
 {
-    "name": "private-extension-marketplace-remote-helper",
+    "name": "private-extension-marketplace-helper",
     "displayName": "Private Extension Marketplace: Remote Helper",
     "description": "Lets Private Extension Marketplace work in remote workspaces.",
     "version": "1.9.4",

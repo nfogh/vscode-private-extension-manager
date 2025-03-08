@@ -2,7 +2,7 @@
 
 ### 1.9.3
 
--   Publish private-extension-marketplace-remote-helper
+-   Publish private-extension-marketplace-helper
 
 ## 1.9.2
 

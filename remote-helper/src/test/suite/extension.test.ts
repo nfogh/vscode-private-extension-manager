@@ -3,7 +3,7 @@ import { before } from 'mocha';
 import 'source-map-support/register';
 import * as vscode from 'vscode';
 
-const EXTENSION_NAME = 'private-extension-marketplace-remote-helper';
+const EXTENSION_NAME = 'private-extension-marketplace-helper';
 const PUBLISHER_ID = 'NikolajFogh';
 const EXTENSION_ID = `${PUBLISHER_ID}.${EXTENSION_NAME}`;
 

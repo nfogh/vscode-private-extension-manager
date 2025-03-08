@@ -20,7 +20,7 @@
         "workspace"
     ],
     "extensionPack": [
-        "NikolajFogh.private-extension-marketplace-remote-helper"
+        "NikolajFogh.private-extension-marketplace-helper"
     ],
     "icon": "media/icon.png",
     "categories": [
