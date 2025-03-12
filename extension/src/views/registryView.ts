@@ -9,6 +9,7 @@ import * as registry from '../Registry';
 import { RegistryProvider } from '../RegistryProvider';
 
 import { ExtensionDetailsView } from './extensionDetailsView';
+import { getLogger } from '../logger';
 
 const localize = nls.loadMessageBundle();
 
@@ -254,9 +255,14 @@ class RegistryItem extends BaseItem {
     }
 
     public async getExtensions() {
-        const children = await this.registry.getPackages();
-        children.sort(Package.compare);
-        return children;
+        try {
+            const children = await this.registry.getPackages();
+            children.sort(Package.compare);
+            return children;
+        } catch (error) {
+            getLogger().log(`Unable to get extensions from ${this.registry.name} (${this.registry.uri}) ${error}`);
+        }
+        return [];
     }
 
     public async getChildren(): Promise<Element[]> {

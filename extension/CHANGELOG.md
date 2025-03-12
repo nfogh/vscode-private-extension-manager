@@ -1,6 +1,10 @@
 # Change Log
 
-### 1.9.3
+## 1.9.6
+
+- Silently log an error instead of showing error message in vscode when we can't fetch from registry
+
+## 1.9.3
 
 -   Publish private-extension-marketplace-helper
 

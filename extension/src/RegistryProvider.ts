@@ -140,8 +140,12 @@ export class RegistryProvider implements Disposable {
         const results = new Map<string, Package>();
 
         for (const registry of this.getRegistries()) {
-            for (const pkg of await registry.getPackages()) {
-                results.set(pkg.extensionId, pkg);
+            try {
+                for (const pkg of await registry.getPackages()) {
+                    results.set(pkg.extensionId, pkg);
+                }
+            } catch (error) {
+                getLogger().log(`Unable to get extensions from ${registry.name} (${registry.uri}) ${error}`);
             }
         }
 
