@@ -3,13 +3,13 @@ import { Disposable, EventEmitter, TreeDataProvider, TreeItem } from 'vscode';
 import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from '../extensionInfo';
+import { getLogger } from '../logger';
 import { Package, PackageState } from '../Package';
 import { Registry } from '../Registry';
 import * as registry from '../Registry';
 import { RegistryProvider } from '../RegistryProvider';
 
 import { ExtensionDetailsView } from './extensionDetailsView';
-import { getLogger } from '../logger';
 
 const localize = nls.loadMessageBundle();
 
