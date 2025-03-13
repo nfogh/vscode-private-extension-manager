@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.9.7
+
+- Hide private extension functionality if there is no .vscode/extensions.private.json
+
 ## 1.9.6
 
 - Silently log an error instead of showing error message in vscode when we can't fetch from registry

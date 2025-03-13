@@ -2,7 +2,7 @@
     "name": "private-extension-marketplace",
     "displayName": "Private Extension Marketplace",
     "description": "Manages extensions hosted in private NPM/OpenVSX registries.",
-    "version": "1.9.6",
+    "version": "1.9.7",
     "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
@@ -86,43 +86,51 @@
             {
                 "command": "privateExtensions.cache.delete",
                 "title": "%command.cache.delete.title%",
-                "category": "%command.category%"
+                "category": "%command.category%",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.cache.garbageCollect",
                 "title": "%command.cache.garbageCollect.title%",
-                "category": "%command.category%"
+                "category": "%command.category%",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.checkForUpdates",
                 "title": "%command.checkForUpdates.title%",
-                "category": "%command.category%"
+                "category": "%command.category%",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.configureWorkspaceRegistries",
                 "title": "%command.configureWorkspaceRegistries.title%",
                 "category": "%command.category%",
-                "icon": "$(edit)"
+                "icon": "$(edit)",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.configureRecommendedExtensions",
                 "title": "%command.configureRecommendedExtensions.title%",
                 "category": "%command.category%",
-                "icon": "$(edit)"
+                "icon": "$(edit)",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.refresh",
                 "title": "%command.refresh.title%",
                 "category": "%command.category%",
-                "icon": "$(refresh)"
+                "icon": "$(refresh)",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.extension.install",
-                "title": "%command.extension.install.title%"
+                "title": "%command.extension.install.title%",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.extension.uninstall",
-                "title": "%command.extension.uninstall.title%"
+                "title": "%command.extension.uninstall.title%",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.extension.update",
@@ -130,30 +138,36 @@
                 "icon": {
                     "light": "media/light/update.svg",
                     "dark": "media/dark/update.svg"
-                }
+                },
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.extension.install.anotherVersion",
-                "title": "%command.extension.install.anotherVersion.title%"
+                "title": "%command.extension.install.anotherVersion.title%",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.extension.switchChannels",
-                "title": "%command.extension.switchChannels.title%"
+                "title": "%command.extension.switchChannels.title%",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.extension.copyInformation",
-                "title": "%command.extension.copyInformation.title%"
+                "title": "%command.extension.copyInformation.title%",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.registry.add",
                 "title": "%command.registry.add.title%",
                 "category": "%command.category%",
-                "icon": "$(new-folder)"
+                "icon": "$(new-folder)",
+                "when": "privateExtensions:active"
             },
             {
                 "command": "privateExtensions.registry.remove",
                 "title": "%command.registry.remove.title%",
-                "category": "%command.category%"
+                "category": "%command.category%",
+                "when": "privateExtensions:active"
             }
         ],
         "viewsContainers": {
@@ -161,7 +175,8 @@
                 {
                     "id": "privateExtensions",
                     "title": "%viewsContainers.activitybar.privateExtensions.title%",
-                    "icon": "media/extensions.svg"
+                    "icon": "media/extensions.svg",
+                    "when": "privateExtensions:active"
                 }
             ]
         },
@@ -169,18 +184,21 @@
             "privateExtensions": [
                 {
                     "id": "privateExtensions.extensions",
-                    "name": "%views.privateExtensions.extensions.name%"
+                    "name": "%views.privateExtensions.extensions.name%",
+                    "when": "privateExtensions:active"
                 },
                 {
                     "id": "privateExtensions.recommended",
-                    "name": "%views.privateExtensions.recommended.name%"
+                    "name": "%views.privateExtensions.recommended.name%",
+                    "when": "privateExtensions:active"
                 }
             ]
         },
         "viewsWelcome": [
             {
                 "view": "privateExtensions.extensions",
-                "contents": "%views.privateExtensions.extensions.noExtensions%"
+                "contents": "%views.privateExtensions.extensions.noExtensions%",
+                "when": "privateExtensions:active"
             },
             {
                 "view": "privateExtensions.extensions",

@@ -14,7 +14,11 @@ import { RegistryView } from './views/registryView';
 
 nls.config({ messageFormat: nls.MessageFormat.file })();
 
-export function activate(context: vscode.ExtensionContext): void {
+async function setActive(enabled: boolean): Promise<void> {
+    await vscode.commands.executeCommand('setContext', 'privateExtensions:active', enabled);
+}
+
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
     setContext(context);
 
     const extensionInfo = new ExtensionInfoService();
@@ -34,9 +38,12 @@ export function activate(context: vscode.ExtensionContext): void {
         registerLanguageFeatures(registryProvider),
         recommendedExtensionPrompter,
     );
+
+    await setActive(true);
 }
 
 export async function deactivate(): Promise<void> {
+    await setActive(false);
     // TODO: should we have some sort of lock file or ref count so we don't
     // delete the cache if another instance of vscode is still active?
     await deleteNpmDownloads();

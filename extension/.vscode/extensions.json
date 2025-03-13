@@ -4,8 +4,6 @@
     "recommendations": [
         "dbaeumer.vscode-eslint",
         "eamodio.tsl-problem-matcher",
-        "editorconfig.editorconfig",
-        "esbenp.prettier-vscode",
-        "spadin.config-defaults"
+        "esbenp.prettier-vscode"
     ]
 }
