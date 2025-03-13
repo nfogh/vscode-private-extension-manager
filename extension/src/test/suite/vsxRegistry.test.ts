@@ -19,7 +19,7 @@ function createFakeVSXServer(registryUrl: string): nock.Scope {
     mock.persist();
 
     mock.get('/api/-/search')
-        .query((query) => query.text === '' && query.offset === '0')
+        .query((query) => query.query === '' && query.offset === '0')
         .reply(200, () => {
             return makeSearchResult([FOOEXTENSION, BAREXTENSION]);
         });
@@ -30,19 +30,19 @@ function createFakeVSXServer(registryUrl: string): nock.Scope {
         });
 
     mock.get('/api/-/search')
-        .query((query) => query.text === 'foo')
+        .query((query) => query.query === 'foo')
         .reply(200, () => {
             return makeSearchResult([FOOEXTENSION]);
         });
 
     mock.get('/api/-/search')
-        .query((query) => query.text === 'bar')
+        .query((query) => query.query === 'bar')
         .reply(200, () => {
             return makeSearchResult([BAREXTENSION]);
         });
 
     mock.get('/api/-/search')
-        .query((query) => query.text !== 'bar' && query.text !== 'foo' && query.text !== '')
+        .query((query) => query.query !== 'bar' && query.query !== 'foo' && query.query !== '')
         .reply(200, () => {
             return makeSearchResult([]);
         });
