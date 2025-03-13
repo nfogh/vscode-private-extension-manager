@@ -11,7 +11,7 @@ import { CancellationToken, Uri } from 'vscode';
 import { ExtensionInfoService } from './extensionInfo';
 import { getLogger } from './logger';
 import { Package } from './Package';
-import { Registry, RegistrySource, VersionInfo, VersionMissingError } from './Registry';
+import { Registry, RegistrySource, RegistryOptions, VersionInfo, VersionMissingError } from './Registry';
 import { getNpmDownloadDir } from './util';
 import {
     SearchResult,
@@ -42,8 +42,13 @@ export class VsxRegistry implements Registry {
     readonly source: RegistrySource;
     readonly registryUrl: string;
 
-    constructor(extensionInfo: ExtensionInfoService, name: string, query: string | string[], registryUrl: string) {
-        this.query = query;
+    constructor(
+        extensionInfo: ExtensionInfoService,
+        name: string,
+        registryUrl: string,
+        options: Partial<RegistryOptions>,
+    ) {
+        this.query = options.query ?? '';
         this.enablePagination = true;
         this.registryUrl = registryUrl;
         this.extensionInfo = extensionInfo;
@@ -113,7 +118,7 @@ export class VsxRegistry implements Registry {
         let stop = false;
         let from = 0;
         while (!stop) {
-            const query = `${this.registryUrl}/api/-/search?text=${this.query}&size=100&offset=${from}`;
+            const query = `${this.registryUrl}/api/-/search?query=${this.query}&size=100&offset=${from}`;
             const reply = await fetch.default(query);
             const searchResult = await reply.json();
 
@@ -130,14 +135,14 @@ export class VsxRegistry implements Registry {
             }
 
             const page = typedResult.extensions.map(
-                (entry) =>
+                (extension) =>
                     new Package(this, {
-                        name: entry.name,
-                        version: entry.version,
-                        displayName: entry.displayName,
-                        publisher: entry.namespace,
-                        description: entry.description,
-                        files: Object.values(entry.files),
+                        name: extension.name,
+                        version: extension.version,
+                        displayName: extension.displayName,
+                        publisher: extension.namespace,
+                        description: extension.description,
+                        files: Object.values(extension.files),
                     }),
             );
 
@@ -212,13 +217,14 @@ export class VsxRegistry implements Registry {
             throw new VersionMissingError(name, version ?? 'latest');
         }
 
+        const extension = typedResult.extensions[0];
         const packageInfo = {
-            name: typedResult.extensions[0].name,
-            version: typedResult.extensions[0].version,
-            displayName: typedResult.extensions[0].displayName,
-            publisher: typedResult.extensions[0].namespace,
-            description: typedResult.extensions[0].description,
-            files: typedResult.extensions[0].files ? Object.values(typedResult.extensions[0].files) : [],
+            name: extension.name,
+            version: extension.version,
+            displayName: extension.displayName,
+            publisher: extension.namespace,
+            description: extension.description,
+            files: extension.files ? Object.values(extension.files) : [],
         };
         return new Package(this, packageInfo);
     }

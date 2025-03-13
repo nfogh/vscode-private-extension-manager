@@ -88,54 +88,42 @@ suite('VSX Registry Package Search', function () {
         const registry = new VsxRegistry(
             sinon.createStubInstance(ExtensionInfoService),
             'FakeRegistry',
-            '',
             REGISTRY_URL,
+            {},
         );
         const packages = await registry.getPackages();
         assert.equal(packages.length, 2);
     });
 
     test('search for packages with the query foo shall return only foo', async function () {
-        const registry = new VsxRegistry(
-            sinon.createStubInstance(ExtensionInfoService),
-            'FakeRegistry',
-            'foo',
-            REGISTRY_URL,
-        );
+        const registry = new VsxRegistry(sinon.createStubInstance(ExtensionInfoService), 'FakeRegistry', REGISTRY_URL, {
+            query: 'foo',
+        });
         const packages = await registry.getPackages();
         assert.equal(packages.length, 1);
         assert.equal(packages[0].name, 'foo');
     });
 
     test('search for packages with the query for unknown package shall return empty set', async function () {
-        const registry = new VsxRegistry(
-            sinon.createStubInstance(ExtensionInfoService),
-            'FakeRegistry',
-            'unknown',
-            REGISTRY_URL,
-        );
+        const registry = new VsxRegistry(sinon.createStubInstance(ExtensionInfoService), 'FakeRegistry', REGISTRY_URL, {
+            query: 'unknown',
+        });
         const packages = await registry.getPackages();
         assert.equal(packages.length, 0);
     });
 
     test('get metadata for a package shall return the metadata', async function () {
-        const registry = new VsxRegistry(
-            sinon.createStubInstance(ExtensionInfoService),
-            'FakeRegistry',
-            'unknown',
-            REGISTRY_URL,
-        );
+        const registry = new VsxRegistry(sinon.createStubInstance(ExtensionInfoService), 'FakeRegistry', REGISTRY_URL, {
+            query: 'unknown',
+        });
         const packageData = await registry.getPackage('foo', '1.0.0');
         assert.equal(packageData.name, 'foo');
     });
 
     test('get versions of a package', async function () {
-        const registry = new VsxRegistry(
-            sinon.createStubInstance(ExtensionInfoService),
-            'FakeRegistry',
-            'unknown',
-            REGISTRY_URL,
-        );
+        const registry = new VsxRegistry(sinon.createStubInstance(ExtensionInfoService), 'FakeRegistry', REGISTRY_URL, {
+            query: 'unknown',
+        });
         const versions = await registry.getPackageVersions('baz.foo');
         assert.equal(versions.length, 2);
         assert.containSubset(versions, [{ version: new SemVer('1.0.1') }, { version: new SemVer('1.0.0') }]);

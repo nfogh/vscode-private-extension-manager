@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.9.8
+
+ - Fix: Honor "query" parameter in vsx registries
+
 ## 1.9.7
 
 - Hide private extension functionality if there is no .vscode/extensions.private.json
