@@ -16,6 +16,11 @@ import { WebView } from './webView';
 
 const localize = nls.loadMessageBundle();
 
+const ExtensionRepository = t.type({
+    type: t.string,
+    url: t.string
+});
+
 const ExtensionManifest = t.partial({
     name: t.string,
     displayName: t.string,
@@ -23,7 +28,7 @@ const ExtensionManifest = t.partial({
     version: t.string,
     publisher: t.string,
     icon: t.string,
-    repository: t.string,
+    repository: ExtensionRepository,
 });
 type ExtensionManifest = t.TypeOf<typeof ExtensionManifest>;
 
@@ -106,7 +111,7 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
     }
 
     public get repository(): string | undefined {
-        return this.data.manifest.repository;
+        return this.data.manifest.repository?.url;
     }
 
     protected async getHead(nonce: string): Promise<string> {
