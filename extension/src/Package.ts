@@ -70,6 +70,9 @@ const PackageManifest = options(
         publisher: t.string,
         description: t.string,
         version: t.string,
+        downloads: t.number,
+        rating: t.number,
+        repository: t.string,
         files: t.array(t.string),
         osSpecificVsix: t.record(t.string, t.string),
     },
@@ -107,6 +110,10 @@ export class Package {
     /* The channel that this package is tracking */
     public readonly channel: string;
 
+    public readonly downloads?: number;
+    public readonly rating?: number;
+    public readonly repository?: string;
+
     private readonly _vsixFile: Result<string>;
     private readonly isPublisherValid: boolean;
 
@@ -128,6 +135,10 @@ export class Package {
         this.name = manifest.name;
         this.channel = channel;
         this.displayName = manifest.displayName ?? this.name;
+
+        this.downloads = manifest.downloads;
+        this.rating = manifest.rating;
+        this.repository = manifest.repository;
 
         // VS Code uses case-insensitive comparison to match extension IDs.
         // Match that behavior by normalizing everything to lowercase.

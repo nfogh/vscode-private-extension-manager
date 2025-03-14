@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import * as t from 'io-ts';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -22,6 +23,7 @@ const ExtensionManifest = t.partial({
     version: t.string,
     publisher: t.string,
     icon: t.string,
+    repository: t.string,
 });
 type ExtensionManifest = t.TypeOf<typeof ExtensionManifest>;
 
@@ -103,6 +105,10 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
         return this.data.changelog;
     }
 
+    public get repository(): string | undefined {
+        return this.data.manifest.repository;
+    }
+
     protected async getHead(nonce: string): Promise<string> {
         return `
             ${await super.getHead(nonce)}
@@ -117,6 +123,9 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
         const readme = this.readme ? await MarkdownView.render(this.readme) : undefined;
         const changelog = this.changelog ? await MarkdownView.render(this.changelog) : undefined;
         const version = this.pkg.installedVersion ?? this.pkg.version;
+        const downloads = this.pkg.downloads;
+        const rating = this.pkg.rating;
+        const repository = this.repository;
 
         // This matches the structure of VS Code's built-in extensions viewer
         // so we can re-use their style sheet.
@@ -148,6 +157,9 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
                                 ${this.pkg.publisher}
                             </span>
                             <span class="version" title="${localize('version', 'Version')}">${version}</span>
+                            <span class="version" title="${localize('downloads', 'Downloads')}">${downloads ? 'Downloads: ' + downloads.toString() : '' }</span>
+                            <span class="version" title="${localize('rating', 'Rating')}">${rating ? 'Rating: ' + rating.toString() : '' }</span>
+                            <span class="version" title="${localize('repository', 'Repository')}">${repository ? 'Repository: <a href="' + repository + '">' + repository + '</a>' : '' }</span>
                         </div>
                         <div class="description">
                             ${this.pkg.description}

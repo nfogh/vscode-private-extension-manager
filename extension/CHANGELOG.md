@@ -1,16 +1,22 @@
 # Change Log
 
+## 1.9.9
+
+-   Feature: Show number of downloads in extension details view (if available)
+-   Feature: Show rating in extension details view (if available)
+-   Feature: Show repository in extensiot details view (if available)
+
 ## 1.9.8
 
- - Fix: Honor "query" parameter in vsx registries
+-   Fix: Honor "query" parameter in vsx registries
 
 ## 1.9.7
 
-- Hide private extension functionality if there is no .vscode/extensions.private.json
+-   Hide private extension functionality if there is no .vscode/extensions.private.json
 
 ## 1.9.6
 
-- Silently log an error instead of showing error message in vscode when we can't fetch from registry
+-   Silently log an error instead of showing error message in vscode when we can't fetch from registry
 
 ## 1.9.3
 

@@ -142,6 +142,8 @@ export class VsxRegistry implements Registry {
                         displayName: extension.displayName,
                         publisher: extension.namespace,
                         description: extension.description,
+                        downloads: extension.downloadCount,
+                        rating: extension.averageRating,
                         files: Object.values(extension.files),
                     }),
             );
@@ -224,6 +226,9 @@ export class VsxRegistry implements Registry {
             displayName: extension.displayName,
             publisher: extension.namespace,
             description: extension.description,
+            downloads: extension.downloads,
+            rating: extension.averageRating,
+            repository: extension.repository,
             files: extension.files ? Object.values(extension.files) : [],
         };
         return new Package(this, packageInfo);
