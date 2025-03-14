@@ -58,6 +58,11 @@ export interface RegistryOptions {
      * Default: 20
      */
     limit: number;
+
+    /**
+     * Namespaces to explicitly exclude from the registry
+     */
+    excludedNamespaces: string[];
 }
 
 export interface VersionInfo {

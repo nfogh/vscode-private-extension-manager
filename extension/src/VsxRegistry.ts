@@ -41,6 +41,7 @@ export class VsxRegistry implements Registry {
     readonly name: string;
     readonly source: RegistrySource;
     readonly registryUrl: string;
+    readonly excludedNamespaces: string[];
 
     constructor(
         extensionInfo: ExtensionInfoService,
@@ -54,6 +55,7 @@ export class VsxRegistry implements Registry {
         this.extensionInfo = extensionInfo;
         this.name = name;
         this.source = RegistrySource.User;
+        this.excludedNamespaces = options.excludedNamespaces ?? [];
     }
     /**
      * The Uri of the registry, if configured. If this is `undefined`, NPM's
@@ -148,7 +150,9 @@ export class VsxRegistry implements Registry {
                     }),
             );
 
-            packages = [...packages, ...page];
+            const filteredPackages = packages.filter((pkg) => !this.excludedNamespaces.includes(pkg.publisher));
+
+            packages = [...filteredPackages, ...page];
             from = from + typedResult.extensions.length;
         }
 

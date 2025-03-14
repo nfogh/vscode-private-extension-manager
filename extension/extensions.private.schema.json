@@ -46,6 +46,13 @@
                         "description": "Number of results to limit each query to when requesting package results.",
                         "type": "integer",
                         "default": 20
+                    },
+                    "excludedNamespaces": {
+                        "description": "Namespaces / publishers to exclude from the registry",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             }

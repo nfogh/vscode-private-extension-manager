@@ -5,6 +5,7 @@
 -   Feature: Show number of downloads in extension details view (if available)
 -   Feature: Show rating in extension details view (if available)
 -   Feature: Show repository in extensiot details view (if available)
+-   Feature: Add ability to exclude explicit namespaces/publishers
 
 ## 1.9.8
 

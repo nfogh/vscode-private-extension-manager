@@ -62,6 +62,7 @@ export class NpmRegistry implements Registry {
     public readonly enablePagination: boolean;
 
     public readonly options: Partial<Options>;
+    public readonly excludedPublishers: string[];
 
     constructor(
         public readonly extensionInfo: ExtensionInfoService,
@@ -75,6 +76,7 @@ export class NpmRegistry implements Registry {
         // leave the search text blank, it will return nothing.
         this.query = query ?? '*';
         this.enablePagination = enablePagination ?? true;
+        this.excludedPublishers = options.excludedNamespaces ?? [];
 
         this.options = {
             cache: getNpmCacheDir(),
@@ -144,7 +146,10 @@ export class NpmRegistry implements Registry {
             }
 
             try {
-                packages.push(await this.getPackage(result.name));
+                const pkg = await this.getPackage(result.name);
+                if (!this.excludedPublishers.includes(pkg.publisher)) {
+                    packages.push(pkg);
+                }
             } catch (ex) {
                 if (ex instanceof NotAnExtensionError) {
                     // Package is not an extension. Ignore.
