@@ -87,10 +87,7 @@ export class Package {
      * Comparison function to sort packages by name in alphabetical order.
      */
     public static compare(a: Package, b: Package): number {
-        const nameA = a.displayName.toUpperCase();
-        const nameB = b.displayName.toUpperCase();
-
-        return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+        return a.displayName.localeCompare(b.displayName);
     }
 
     /** The package name. */
@@ -118,7 +115,7 @@ export class Package {
     private readonly isPublisherValid: boolean;
 
     private _isInstalled = false;
-    private _isUiExtension = false;
+    private readonly _isUiExtension;
     private _installedVersion: SemVer | null = null;
     private _installedExtensionKind: vscode.ExtensionKind | undefined;
 
@@ -203,7 +200,7 @@ export class Package {
      * The NPM package specifier for the package.
      */
     public get spec(): string {
-        return `${this.name}@${this.version}`;
+        return `${this.name}@${this.version.format()}`;
     }
 
     /**

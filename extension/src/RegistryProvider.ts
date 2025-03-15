@@ -37,15 +37,15 @@ type ExtensionsConfig = t.TypeOf<typeof ExtensionsConfig>;
  * Provides registries collected from user and workspace configuration.
  */
 export class RegistryProvider implements Disposable {
-    private _onDidChangeRegistries = new EventEmitter<void>();
+    private readonly _onDidChangeRegistries = new EventEmitter<void>();
 
     /**
      * An event that is emitted when the registry configuration changes.
      */
     public readonly onDidChangeRegistries = this._onDidChangeRegistries.event;
 
-    private disposable: Disposable;
-    private folders: FolderRegistryProvider[] = [];
+    private readonly disposable: Disposable;
+    private readonly folders: FolderRegistryProvider[] = [];
     private isStale = true;
     private userRegistries: Registry[] = [];
 
@@ -64,7 +64,7 @@ export class RegistryProvider implements Disposable {
 
     public dispose(): void {
         this.disposable.dispose();
-        this.folders.map((f) => f.dispose());
+        this.folders.forEach((f) => f.dispose());
     }
 
     /**
@@ -245,7 +245,7 @@ export class RegistryProvider implements Disposable {
         const idx = this.folders.findIndex((value) => value.folder === folder);
         if (idx >= 0) {
             const removed = this.folders.splice(idx, 1);
-            removed.map((f) => f.dispose());
+            removed.forEach((f) => f.dispose());
         }
     }
 }
@@ -254,7 +254,7 @@ export class RegistryProvider implements Disposable {
  * Provides NPM registries for one workspace folder.
  */
 class FolderRegistryProvider implements Disposable {
-    private _onDidChangeRegistries = new EventEmitter<void>();
+    private readonly _onDidChangeRegistries = new EventEmitter<void>();
 
     /**
      * An event that is emitted when the registry configuration changes.
@@ -266,8 +266,8 @@ class FolderRegistryProvider implements Disposable {
     private readonly configFolder: string;
     private isStale = true;
     private configFile: vscode.Uri | null;
-    private disposable: Disposable;
-    private configFileWatcher: vscode.FileSystemWatcher;
+    private readonly disposable: Disposable;
+    private readonly configFileWatcher: vscode.FileSystemWatcher;
     private registries: Registry[] = [];
     private recommendedExtensions: string[] = [];
 

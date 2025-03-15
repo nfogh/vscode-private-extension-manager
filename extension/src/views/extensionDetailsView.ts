@@ -41,7 +41,7 @@ interface ExtensionData {
 }
 
 export class ExtensionDetailsView extends WebView<ExtensionData> {
-    private disposable2: Disposable;
+    private readonly disposable2: Disposable;
 
     constructor(private readonly extensionInfo: ExtensionInfoService) {
         super(getLocalResourceRoots());
@@ -161,7 +161,7 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
                             <span class="publisher" title="${localize('publisher', 'Publisher')}">
                                 ${this.pkg.publisher}
                             </span>
-                            <span class="version" title="${localize('version', 'Version')}">${version}</span>
+                            <span class="version" title="${localize('version', 'Version')}">${version.format() }</span>
                             <span class="version" title="${localize('downloads', 'Downloads')}">${downloads ? 'Downloads: ' + downloads.toString() : '' }</span>
                             <span class="version" title="${localize('rating', 'Rating')}">${rating ? 'Rating: ' + rating.toString() : '' }</span>
                             <span class="version" title="${localize('repository', 'Repository')}">${repository ? 'Repository: <a href="' + repository + '">' + repository + '</a>' : '' }</span>
@@ -246,7 +246,7 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
             addActionButton(
                 actions,
                 'prominent update',
-                localize('update.to.version', 'Update to {0}', this.pkg.version.toString()),
+                localize('update.to.version', 'Update to {0}', this.pkg.version.format() ),
                 'privateExtensions.extension.update',
                 this.pkg.extensionId,
             );
