@@ -7,7 +7,13 @@ NPM or VSX registry. This lets you distribute organization-specific extensions u
 private NPM registry server such as [Sonatype Nexus](https://www.sonatype.com/product-nexus-repository)
 or [Verdaccio](https://verdaccio.org). Or using an [OpenVSX](https://github.com/eclipse/openvsx) instance.
 
-# Managing Extensions
+# Setup
+
+To use the private extension marketplace, you need to open a workspace which contains 
+a .vscode/extensions.private.json file. Or you need to add a private extension repository
+in your user settings. See the section [Workspace Configuration](#workspace-configuration) for instructions.
+
+# Usage
 
 Select the **Private Extensions** icon on the activity bar:
 
@@ -16,15 +22,9 @@ Select the **Private Extensions** icon on the activity bar:
 This works similarly to Visual Studio Code's built-in extensions manager and
 allows you to install, update, and uninstall private extensions.
 
-By default, the view will be empty. You will need to publish extensions to your
-private registry and tell the extension manager how to find the registry before
-you can use it.
-
-# Setup
-
 ## Publishing Extensions (NPM registry)
 
-To allow Private Extension Marketplace to find your extension,
+To publish your package to an npm registry,
 [package it in the VSIX format using vsce](https://code.visualstudio.com/api/working-with-extensions/publishing-extension),
 create an NPM package containing the .vsix file, and publish it to an NPM
 registry. Your extension's `package.json` must contain a `files` array with the
@@ -118,7 +118,8 @@ unsupported platforms.
 
 ## OpenVSX repositories
 
-For Open VSX repositories, follow the guides found in the [Open VSX pages](https://github.com/eclipse/openvsx/wiki/Deploying-Open-VSX) to install an OpenVSX server.
+For Open VSX repositories, follow the guides found in the [Open VSX pages](https://github.com/eclipse/openvsx/wiki/Deploying-Open-VSX) to install an OpenVSX server. Then point to
+the URL of your OpenVSX server in the "registry" part of
 
 ## Discovering Extensions
 
@@ -155,14 +156,31 @@ The file has the following structure (for an npm registry):
 
 For an OpenVSX registry, use the type "vsx".
 
+```JSON
+{
+    "registries": [
+        {
+            "name": "OpenVSX",
+            "registry": "https://open-vsx.org",
+            "type": "vsx"
+        }
+    ],
+    "recommendations": [
+        "garmin.example-extension"
+    ]
+}
+```
+
 The `registries` array defines one or more registries to search for private
 extensions. Each item supports the following fields:
 
 -   **name**: Name to display for the registry.
 -   **registry**: (Optional) The address of the registry which contains the extension packages.
-    If omitted, the registry is determined according to standard [NPM config files](https://docs.npmjs.com/files/npmrc), or in the case of a VSX registry, it will use [OpenVSX](https://open-vsx.org/)
--   **query**: (Optional) Display only packages that match this [search query](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#get-v1search).
-    This is either an array of search terms or a string with space-delimited terms.
+    If omitted, the registry is determined according to standard [NPM config files](https://docs.npmjs.com/files/npmrc),
+    or in the case of a VSX registry, it will use [OpenVSX](https://open-vsx.org/)
+-   **query**: (Optional) Display only packages that match this search query. 
+    For NPM registries, the [search query](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#get-v1search)
+    is either an array of search terms or a string with space-delimited terms.
     For example, `"keywords:group1 keywords:group2"` would display only packages
     that have the either of the keywords `group1` or `group2`.
 -   **enablePagination**: (Optional) If `true`, keep requesting more package results from the registry
@@ -184,8 +202,9 @@ file. The extension manager will display the registries and recommendations from
 all of them.
 
 **Note:** if the `query` option is omitted, the query text will be a single
-asterisk. Some registry servers such as Verdaccio do not respond to this with
-all available packages, so you may need to set `query` to get any results at all.
+asterisk for NPM servers. Some registry servers such as Verdaccio do not respond
+to this with all available packages, so you may need to set `query` to get any
+results at all.
 
 ### User Configuration
 
@@ -275,7 +294,7 @@ being discarded.
 
 If packages aren't being discarded, they may not be found to begin with. If you
 do not specify a `query` or other options in your registry configuration, the
-default search query is:
+default search query for NPM is:
 
 ```
 {registry-url}/-/v1/search?text=*&size=20&from=0
@@ -290,4 +309,4 @@ section above.
 
 When communicating with the private extension servers you have configured, the
 extension will not transmit any data beyond what is necessary to establish the
-connection. The extension will not transmit any data back to Garmin.
+connection. The extension will not transmit data to any 3rd party.
