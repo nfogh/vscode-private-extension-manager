@@ -2,7 +2,7 @@
     "name": "private-extension-marketplace",
     "displayName": "Private Extension Marketplace",
     "description": "Manages extensions hosted in private NPM/OpenVSX registries.",
-    "version": "1.9.9",
+    "version": "1.9.10",
     "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
@@ -10,7 +10,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/nikolaj.fogh/vscode-private-extension-manager.git",
+        "url": "https://github.com/nfogh/vscode-private-extension-manager.git",
         "directory": "extension"
     },
     "engines": {

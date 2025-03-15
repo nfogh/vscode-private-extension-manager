@@ -1,41 +1,46 @@
 # Change Log
 
+## 1.9.10
+
+-   Fixed: Set repository to the right github repo
+-   Changed: Improved documentation for VSX setups
+
 ## 1.9.9
 
--   Feature: Show number of downloads in extension details view (if available)
--   Feature: Show rating in extension details view (if available)
--   Feature: Show repository in extensiot details view (if available)
+-   Added: Show number of downloads in extension details view (if available)
+-   Added: Show rating in extension details view (if available)
+-   Added: Show repository in extensiot details view (if available)
 
 ## 1.9.8
 
--   Fix: Honor "query" parameter in vsx registries
+-   Fixed: Honor "query" parameter in vsx registries
 
 ## 1.9.7
 
--   Hide private extension functionality if there is no .vscode/extensions.private.json
+-   Changed: Hide private extension functionality if there is no .vscode/extensions.private.json
 
 ## 1.9.6
 
--   Silently log an error instead of showing error message in vscode when we can't fetch from registry
+-   Fixed: Silently log an error instead of showing error message in vscode when we can't fetch from registry
 
 ## 1.9.3
 
--   Publish private-extension-marketplace-helper
+-   Changed: Publish private-extension-marketplace-helper
 
 ## 1.9.2
 
--   Fix updating of OpenVSX registry packages
+-   Fixed: Updating of OpenVSX registry packages
 
 ## 1.9.1
 
--   Fix recommended extension notifier for remote workspaces
+-   Fixed: Recommended extension notifier for remote workspaces
 
 ## 1.9.0
 
--   Added support for OpenVSX repositories.
--   Make a popup for recommended private extensions, similar to how vscode does it.
--   Changed name to private-extension-marketplace to avoid clashes with joels extension.
--   Show a badge with the number of updatable extensions
+-   Added: Added support for OpenVSX repositories.
+-   Added: Make a popup for recommended private extensions, similar to how vscode does it.
+-   Changed: Renamed to name to private-extension-marketplace to avoid clashes with joels extension.
+-   Added: Show a badge with the number of updatable extensions
 
 ## 1.8.0
 
