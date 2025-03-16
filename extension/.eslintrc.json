@@ -15,8 +15,7 @@
         "plugin:@typescript-eslint/recommended",
         "plugin:import/errors",
         "plugin:import/warnings",
-        "plugin:import/typescript",
-        "plugin:prettier/recommended"
+        "plugin:import/typescript"
     ],
     "rules": {
         "@typescript-eslint/explicit-function-return-type": "off",

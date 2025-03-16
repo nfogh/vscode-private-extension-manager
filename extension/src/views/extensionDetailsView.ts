@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import * as t from 'io-ts';
 import * as path from 'path';
 import * as vscode from 'vscode';
