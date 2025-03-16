@@ -47,6 +47,7 @@ suite('Registry Package Search', function () {
         scope.get('/bar').reply(200, PACKAGE.bar);
         scope.get('/baz').reply(200, PACKAGE.baz);
         scope.get('/invalid').reply(200, PACKAGE.invalid);
+        scope.get('/-/ping').reply(200, {});
 
         // TODO: add mock tarball responses and test package downloads.
     });
@@ -68,6 +69,23 @@ suite('Registry Package Search', function () {
 
     afterEach(function () {
         extensionInfo.dispose();
+    });
+
+    test('isRegistry shall return for npm registry', async function () {
+        assert.isTrue(await NpmRegistry.isRegistry(REGISTRY_URL));
+    });
+
+    test('isRegistry shall return false for non-npm registry', async function () {
+        const nonvsxregistryUrl = 'https://nonnpmregistry.local';
+        const mock = nock(nonvsxregistryUrl);
+        mock.get('/-/ping').reply(
+            302,
+            () => {
+                return null;
+            },
+            { location: '/error' },
+        );
+        assert.isFalse(await NpmRegistry.isRegistry(nonvsxregistryUrl));
     });
 
     test('Create registry', async function () {

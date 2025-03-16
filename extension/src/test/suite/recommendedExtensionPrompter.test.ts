@@ -17,7 +17,7 @@ suite('RecommendedExtensionPrompter', function () {
         const installedExtension2 = 'recommendedPublisher2.recommendedExtension1';
 
         const registryProvider = sinon.createStubInstance(RegistryProvider);
-        registryProvider.getRecommendedExtensions.returns(recommendedExtensions);
+        registryProvider.getRecommendedExtensions.resolves(recommendedExtensions);
 
         const recommendedExtensionPrompter = new RecommendedExtensionPrompter(registryProvider, () => {
             return new Set([installedExtension1]);

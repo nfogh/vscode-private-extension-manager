@@ -82,7 +82,7 @@ export class ExtensionInfoService implements vscode.Disposable {
         }
     }
 
-    private _onDidChange = new vscode.EventEmitter<void>();
+    private readonly _onDidChange = new vscode.EventEmitter<void>();
 
     /**
      * An event which fires when any extension on the local or remote machine
@@ -111,7 +111,7 @@ export class ExtensionInfoService implements vscode.Disposable {
      */
     private readonly extensionCache: Record<string, ExtensionInfo | undefined> = {};
 
-    private disposable: vscode.Disposable;
+    private readonly disposable: vscode.Disposable;
 
     private get myExtensionKind() {
         return vscode.env.remoteName ? vscode.ExtensionKind.Workspace : vscode.ExtensionKind.UI;

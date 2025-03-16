@@ -81,7 +81,7 @@ suite('Registry Provider', function () {
 
         const provider = new RegistryProvider(extensionInfo);
 
-        const registries = provider.getRegistries();
+        const registries = await provider.getRegistries();
 
         // Registries should be in the order they are defined, with workspace
         // registries first and user registries last.
@@ -96,7 +96,7 @@ suite('Registry Provider', function () {
 
         const provider = new RegistryProvider(extensionInfo);
 
-        const recommendations = provider.getRecommendedExtensions();
+        const recommendations = await provider.getRecommendedExtensions();
         const expected = new Set(['test.recommended1', 'test.recommended2']);
 
         assert.deepStrictEqual(recommendations, expected);

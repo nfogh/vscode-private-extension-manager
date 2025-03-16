@@ -1,7 +1,12 @@
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls/node';
 
 import * as install from './install';
+import { getLogger } from './logger';
 import { RegistryProvider } from './RegistryProvider';
+import { toString } from './util';
+
+const localize = nls.loadMessageBundle();
 
 interface RemoteHelperExtensionInfo {
     id: string;
@@ -13,11 +18,16 @@ export class RecommendedExtensionPrompter implements vscode.Disposable {
     private readonly disposable: vscode.Disposable;
 
     public async isInstalledRemote(extension: string): Promise<boolean> {
-        const extensionInfo = await vscode.commands.executeCommand<RemoteHelperExtensionInfo>(
-            '_privateExtensionMarketplace.remoteHelper.getExtension',
-            extension,
-        );
-        return extensionInfo !== undefined;
+        try {
+            const extensionInfo = await vscode.commands.executeCommand<RemoteHelperExtensionInfo>(
+                '_privateExtensionMarketplace.remoteHelper.getExtension',
+                extension,
+            );
+            return extensionInfo !== undefined;
+        } catch (ex) {
+            getLogger().log(localize('warn.remote.helper.fail', 'Failed to call remote helper:\n{0}', toString(ex)));
+            return false;
+        }
     }
 
     public async removeInstalledExtensions(extensions: string[]): Promise<string[]> {
@@ -39,7 +49,7 @@ export class RecommendedExtensionPrompter implements vscode.Disposable {
     }
 
     public async configurationChanged() {
-        const recommendedExtensions = [...this.registryProvider.getRecommendedExtensions()];
+        const recommendedExtensions = [...(await this.registryProvider.getRecommendedExtensions())];
         const recommendedButNotInstalled = await this.removeInstalledExtensions(recommendedExtensions);
         if (recommendedButNotInstalled.length > 0) {
             const reply = await vscode.window.showInformationMessage(

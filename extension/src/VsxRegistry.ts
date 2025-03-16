@@ -42,6 +42,16 @@ export class VsxRegistry implements Registry {
     readonly source: RegistrySource;
     readonly registryUrl: string;
 
+    public static async isRegistry(url: string): Promise<boolean> {
+        try {
+            const reply = await fetch.default(url + '/api/version');
+            const versionResult = await reply.json();
+            return versionResult.version !== undefined;
+        } catch {
+            return false;
+        }
+    }
+
     constructor(
         extensionInfo: ExtensionInfoService,
         name: string,
@@ -113,48 +123,53 @@ export class VsxRegistry implements Registry {
      * @param _token Token to use to cancel the search.
      */
     async getPackages(_token?: CancellationToken): Promise<Package[]> {
-        let packages: Package[] = [];
+        try {
+            let packages: Package[] = [];
 
-        let stop = false;
-        let from = 0;
-        while (!stop) {
-            const query = `${this.registryUrl}/api/-/search?query=${this.query}&size=100&offset=${from}`;
-            const reply = await fetch.default(query);
-            const searchResult = await reply.json();
+            let stop = false;
+            let from = 0;
+            while (!stop) {
+                const query = `${this.registryUrl}/api/-/search?query=${this.query}&size=100&offset=${from}`;
+                const reply = await fetch.default(query);
+                const searchResult = await reply.json();
 
-            const result = SearchResultRT.decode(searchResult);
+                const result = SearchResultRT.decode(searchResult);
 
-            if (isLeft(result)) {
-                getLogger().log(`Invalid response to ${query}: ${PathReporter.report(result).join(',')}`);
-                throw new Error(`Invalid response from server. See output pane for details.`);
+                if (isLeft(result)) {
+                    getLogger().log(`Invalid response to ${query}: ${PathReporter.report(result).join(',')}`);
+                    throw new Error(`Invalid response from server. See output pane for details.`);
+                }
+                const typedResult: SearchResult = result.right;
+
+                if (typedResult.extensions.length === 0) {
+                    stop = true;
+                }
+
+                const page = typedResult.extensions.map(
+                    (extension) =>
+                        new Package(this, {
+                            name: extension.name,
+                            version: extension.version,
+                            displayName: extension.displayName,
+                            publisher: extension.namespace,
+                            description: extension.description,
+                            downloads: extension.downloadCount,
+                            rating: extension.averageRating,
+                            files: Object.values(extension.files),
+                        }),
+                );
+
+                packages = [...packages, ...page];
+                from = from + typedResult.extensions.length;
             }
-            const typedResult: SearchResult = result.right;
 
-            if (typedResult.extensions.length === 0) {
-                stop = true;
-            }
+            await Promise.all(packages.map((pkg) => pkg.updateState()));
 
-            const page = typedResult.extensions.map(
-                (extension) =>
-                    new Package(this, {
-                        name: extension.name,
-                        version: extension.version,
-                        displayName: extension.displayName,
-                        publisher: extension.namespace,
-                        description: extension.description,
-                        downloads: extension.downloadCount,
-                        rating: extension.averageRating,
-                        files: Object.values(extension.files),
-                    }),
-            );
-
-            packages = [...packages, ...page];
-            from = from + typedResult.extensions.length;
+            return packages;
+        } catch (e: any) {
+            getLogger().log(`Error while fetching packages ${e}`);
+            return [];
         }
-
-        await Promise.all(packages.map((pkg) => pkg.updateState()));
-
-        return packages;
     }
 
     /**

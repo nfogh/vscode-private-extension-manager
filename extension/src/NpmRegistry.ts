@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as t from 'io-ts';
 import * as npmsearch from 'libnpmsearch';
 import { Options } from 'libnpmsearch';
+import * as fetch from 'node-fetch';
 import * as npa from 'npm-package-arg';
 import * as npmfetch from 'npm-registry-fetch';
 import * as pacote from 'pacote';
@@ -54,6 +55,10 @@ const PackageVersionData = options(
 );
 type PackageVersionData = t.TypeOf<typeof PackageVersionData>;
 
+function isEmptyJson(json: any): boolean {
+    return Object.keys(json).length === 0;
+}
+
 /**
  * Represents an NPM registry.
  */
@@ -62,6 +67,15 @@ export class NpmRegistry implements Registry {
     public readonly enablePagination: boolean;
 
     public readonly options: Partial<Options>;
+
+    public static async isRegistry(url: string): Promise<boolean> {
+        try {
+            const reply = await fetch.default(url + '/-/ping');
+            return isEmptyJson(await reply.json());
+        } catch {
+            return false;
+        }
+    }
 
     constructor(
         public readonly extensionInfo: ExtensionInfoService,
@@ -288,8 +302,8 @@ export class NpmRegistry implements Registry {
                 localize(
                     'warn.too.many.results',
                     'Private extension registry {0} returned too many results. If your server does not handle ' +
-                        'pagination, add \'"enablePagination": false\' to your registry configuration. ' +
-                        'If this returns too few results, adjust "limit" as well.',
+                    'pagination, add \'"enablePagination": false\' to your registry configuration. ' +
+                    'If this returns too few results, adjust "limit" as well.',
                     this.uri?.toString(),
                 ),
             );

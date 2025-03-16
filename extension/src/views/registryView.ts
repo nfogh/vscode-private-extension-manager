@@ -143,9 +143,9 @@ class ExtensionsProvider implements TreeDataProvider<Element>, Disposable {
         this._onDidChangeTreeData.fire(undefined);
     }
 
-    public getRegistries() {
+    public async getRegistries() {
         if (this.children === undefined) {
-            this.children = this.registryProvider.getRegistries();
+            this.children = await this.registryProvider.getRegistries();
             this.children.sort(registry.compare);
         }
 
@@ -153,7 +153,7 @@ class ExtensionsProvider implements TreeDataProvider<Element>, Disposable {
     }
 
     private async getRootChildren(): Promise<Element[] | null> {
-        const children = this.getRegistries();
+        const children = await this.getRegistries();
 
         if (children.length === 0) {
             return null;
@@ -177,10 +177,10 @@ class ExtensionsProvider implements TreeDataProvider<Element>, Disposable {
  * without any registry heirarchy.
  */
 class RecommendedProvider implements TreeDataProvider<Element>, Disposable {
-    private _onDidChangeTreeData = new EventEmitter<Element | undefined>();
+    private readonly _onDidChangeTreeData = new EventEmitter<Element | undefined>();
     public readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-    private disposable: Disposable;
+    private readonly disposable: Disposable;
 
     constructor(private readonly registryProvider: RegistryProvider) {
         this.disposable = Disposable.from(
@@ -211,7 +211,7 @@ class RecommendedProvider implements TreeDataProvider<Element>, Disposable {
     }
 
     protected async getRecommendedExtensions() {
-        const recommendedExtensions = this.registryProvider.getRecommendedExtensions();
+        const recommendedExtensions = await this.registryProvider.getRecommendedExtensions();
         const extensions: Package[] = [];
 
         for (const pkg of await this.registryProvider.getUniquePackages()) {

@@ -18,6 +18,9 @@ function createFakeVSXServer(registryUrl: string): nock.Scope {
     const mock = nock(registryUrl);
     mock.persist();
 
+    mock.get('/api/version').reply(200, () => {
+        return { version: 'v0.23.0' };
+    });
     mock.get('/api/-/search')
         .query((query) => query.query === '' && query.offset === '0')
         .reply(200, () => {
@@ -82,6 +85,19 @@ suite('VSX Registry Package Search', function () {
 
     after(() => {
         fakeVsxRegistry.removeAllListeners();
+    });
+
+    test('isRegistry shall return for openvsx server', async function () {
+        assert.isTrue(await VsxRegistry.isRegistry(REGISTRY_URL));
+    });
+
+    test('isRegistry shall return false for non-openvsx server', async function () {
+        const nonvsxregistryUrl = 'https://nonvsxregistry.local';
+        const mock = nock(nonvsxregistryUrl);
+        mock.get('/api/version').reply(200, () => {
+            return { error: 'not_found', reason: 'Document is missing attachment' };
+        });
+        assert.isFalse(await VsxRegistry.isRegistry(nonvsxregistryUrl));
     });
 
     test('search for all packages shall return all packages', async function () {

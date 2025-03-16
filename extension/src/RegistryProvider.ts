@@ -89,14 +89,14 @@ export class RegistryProvider implements Disposable {
      *
      * This includes registries defined in user settings.
      */
-    public getRegistries(): Registry[] {
+    public async getRegistries(): Promise<Registry[]> {
         const registries: Registry[] = [];
 
         // dedupeRegistries() keeps the first item for each duplicate registry.
         // Add workspace registries first so they override duplicate items in
         // the user configuration.
         for (const folder of this.folders) {
-            registries.push(...folder.getRegistries());
+            registries.push(...(await folder.getRegistries()));
         }
 
         registries.push(...this.getUserRegistries());
@@ -120,11 +120,11 @@ export class RegistryProvider implements Disposable {
      * Gets a list of extension IDs for extensions recommended for users of the
      * current workspace.
      */
-    public getRecommendedExtensions(): Set<string> {
+    public async getRecommendedExtensions(): Promise<Set<string>> {
         const extensions = new Set<string>();
 
         for (const folder of this.folders) {
-            for (const name of folder.getRecommendedExtensions()) {
+            for (const name of await folder.getRecommendedExtensions()) {
                 extensions.add(name);
             }
         }
@@ -139,7 +139,7 @@ export class RegistryProvider implements Disposable {
     public async getUniquePackages(): Promise<Package[]> {
         const results = new Map<string, Package>();
 
-        for (const registry of this.getRegistries()) {
+        for (const registry of await this.getRegistries()) {
             try {
                 for (const pkg of await registry.getPackages()) {
                     results.set(pkg.extensionId, pkg);
@@ -194,19 +194,40 @@ export class RegistryProvider implements Disposable {
         getConfig().update('registries', registries, vscode.ConfigurationTarget.Global);
     }
 
-    private updateUserRegistries() {
+    private async updateUserRegistries() {
         this.userRegistries = [];
 
         const userRegistries = this.getUserRegistryConfig();
 
         for (const item of userRegistries) {
             const { name, type, ...options } = item;
-            if (type === 'vsx') {
-                this.userRegistries.push(
-                    new VsxRegistry(this.extensionInfo, name, item.registry ?? 'https://open-vsx.org', options),
-                );
+            if (type) {
+                if (type === 'vsx') {
+                    this.userRegistries.push(
+                        new VsxRegistry(this.extensionInfo, name, options.registry ?? 'https://open-vsx.org', options),
+                    );
+                } else {
+                    this.userRegistries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.User, options));
+                }
             } else {
-                this.userRegistries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.User, options));
+                if (options.registry) {
+                    if (await NpmRegistry.isRegistry(options.registry)) {
+                        this.userRegistries.push(
+                            new NpmRegistry(this.extensionInfo, name, RegistrySource.User, options),
+                        );
+                    } else if (await VsxRegistry.isRegistry(options.registry)) {
+                        this.userRegistries.push(
+                            new VsxRegistry(
+                                this.extensionInfo,
+                                name,
+                                options.registry ?? 'https://open-vsx.org',
+                                options,
+                            ),
+                        );
+                    } else {
+                        getLogger().log(`Unable to auto-detect registry type for ${options.registry}`);
+                    }
+                }
             }
         }
     }
@@ -312,13 +333,13 @@ class FolderRegistryProvider implements Disposable {
         this.isStale = true;
     }
 
-    public getRegistries() {
-        this.updateRegistries();
+    public async getRegistries(): Promise<Registry[]> {
+        await this.updateRegistries();
         return this.registries;
     }
 
-    public getRecommendedExtensions() {
-        this.updateRegistries();
+    public async getRecommendedExtensions() {
+        await this.updateRegistries();
         return this.recommendedExtensions;
     }
 
@@ -327,14 +348,14 @@ class FolderRegistryProvider implements Disposable {
         this._onDidChangeRegistries.fire();
     }
 
-    private updateRegistries() {
+    private async updateRegistries() {
         if (this.isStale) {
-            this.readConfigFile();
+            await this.readConfigFile();
             this.isStale = false;
         }
     }
 
-    private readConfigFile() {
+    private async readConfigFile() {
         this.registries = [];
         this.recommendedExtensions = [];
 
@@ -349,13 +370,38 @@ class FolderRegistryProvider implements Disposable {
         if (config.registries) {
             for (const registry of config.registries) {
                 const { name, type, ...options } = registry;
-
-                if (type === 'vsx') {
-                    this.registries.push(
-                        new VsxRegistry(this.extensionInfo, name, registry.registry ?? 'https://open-vsx.org', options),
-                    );
+                if (type) {
+                    if (type === 'vsx') {
+                        this.registries.push(
+                            new VsxRegistry(
+                                this.extensionInfo,
+                                name,
+                                options.registry ?? 'https://open-vsx.org',
+                                options,
+                            ),
+                        );
+                    } else {
+                        this.registries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.User, options));
+                    }
                 } else {
-                    this.registries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.Workspace, options));
+                    if (options.registry) {
+                        if (await NpmRegistry.isRegistry(options.registry)) {
+                            this.registries.push(
+                                new NpmRegistry(this.extensionInfo, name, RegistrySource.User, options),
+                            );
+                        } else if (await VsxRegistry.isRegistry(options.registry)) {
+                            this.registries.push(
+                                new VsxRegistry(
+                                    this.extensionInfo,
+                                    name,
+                                    options.registry ?? 'https://open-vsx.org',
+                                    options,
+                                ),
+                            );
+                        } else {
+                            getLogger().log(`Unable to auto-detect registry type for ${options.registry}`);
+                        }
+                    }
                 }
             }
         }

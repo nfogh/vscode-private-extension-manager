@@ -18,7 +18,7 @@ export async function findPackage(
     extensionId: string,
     version?: string,
 ): Promise<Package> {
-    const registries = getRegistries(registry);
+    const registries = await getRegistries(registry);
     const name = stripPublisher(extensionId);
 
     return await _findPackage(registries, name, version);
@@ -33,7 +33,7 @@ export async function getPackageVersions(
     registry: Registry | RegistryProvider,
     extensionId: string,
 ): Promise<VersionInfo[]> {
-    const registries = getRegistries(registry);
+    const registries = await getRegistries(registry);
     const name = stripPublisher(extensionId);
 
     return await _findVersions(registries, name);
@@ -48,14 +48,14 @@ export async function getPackageChannels(
     registry: Registry | RegistryProvider,
     extensionId: string,
 ): Promise<Map<string, VersionInfo>> {
-    const registries = getRegistries(registry);
+    const registries = await getRegistries(registry);
     const name = stripPublisher(extensionId);
 
     return await _findChannels(registries, name);
 }
 
-function getRegistries(registry: Registry | RegistryProvider) {
-    return registry instanceof RegistryProvider ? registry.getRegistries() : [registry];
+async function getRegistries(registry: Registry | RegistryProvider) {
+    return registry instanceof RegistryProvider ? await registry.getRegistries() : [registry];
 }
 
 async function _findPackage(registries: readonly Registry[], name: string, version?: string) {
