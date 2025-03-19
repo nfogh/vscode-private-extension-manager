@@ -14,13 +14,14 @@ import { RegistryView } from './views/registryView';
 
 nls.config({ messageFormat: nls.MessageFormat.file })();
 
-async function setActive(enabled: boolean): Promise<void> {
-    await vscode.commands.executeCommand('setContext', 'privateExtensions:active', enabled);
+let isActive = false;
+
+async function setActive(active: boolean): Promise<void> {
+    isActive = active;
+    await vscode.commands.executeCommand('setContext', 'privateExtensions:active', active);
 }
 
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
-    setContext(context);
-
+async function doActivate(context: vscode.ExtensionContext) {
     const extensionInfo = new ExtensionInfoService();
     const registryProvider = new RegistryProvider(extensionInfo);
     const registryView = new RegistryView(registryProvider, extensionInfo);
@@ -42,11 +43,41 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     await setActive(true);
 }
 
-export async function deactivate(): Promise<void> {
+async function doDeactivate() {
     await setActive(false);
     // TODO: should we have some sort of lock file or ref count so we don't
     // delete the cache if another instance of vscode is still active?
     await deleteNpmDownloads();
+}
+
+async function shouldBeActive(): Promise<boolean> {
+    return (
+        vscode.workspace.getConfiguration('privateExtensions').has('registries') ||
+        (await vscode.workspace.findFiles('.vscode/extensions.private.json')).length !== 0
+    );
+}
+
+async function handleActivation(context: vscode.ExtensionContext) {
+    if (!isActive && (await shouldBeActive())) {
+        await doActivate(context);
+    } else if (isActive && !(await shouldBeActive())) {
+        await doDeactivate();
+    }
+}
+
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
+    setContext(context);
+
+    await handleActivation(context);
+    vscode.workspace.onDidChangeConfiguration(async (configurationChangedEvent) => {
+        if (configurationChangedEvent.affectsConfiguration('privateExtensions')) {
+            await handleActivation(context);
+        }
+    });
+}
+
+export async function deactivate(): Promise<void> {
+    await doDeactivate();
 }
 
 function registerCommands(

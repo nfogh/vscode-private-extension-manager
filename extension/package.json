@@ -30,7 +30,7 @@
         "multi-root-ready"
     ],
     "activationEvents": [
-        "workspaceContains:.vscode/extensions.private.json"
+        "onStartupFinished"
     ],
     "main": "./dist/extension.js",
     "contributes": {
