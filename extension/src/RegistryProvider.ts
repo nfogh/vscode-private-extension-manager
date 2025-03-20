@@ -99,7 +99,7 @@ export class RegistryProvider implements Disposable {
             for (const folder of this.folders) {
                 registries.push(...folder.getRegistries());
             }
-        } catch (e: any){
+        } catch (e: any) {
             if (!(e instanceof TypeError)) {
                 throw e;
             }
@@ -108,13 +108,13 @@ export class RegistryProvider implements Disposable {
 
         try {
             registries.push(...this.getUserRegistries());
-        } catch (e: any){
+        } catch (e: any) {
             if (!(e instanceof TypeError)) {
                 throw e;
             }
             getLogger().log(e.message);
         }
-        
+
         return dedupeRegistries(registries);
     }
 

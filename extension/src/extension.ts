@@ -18,17 +18,15 @@ let isActive = false;
 let extensionInfo: ExtensionInfoService | undefined = undefined;
 let registryProvider: RegistryProvider | undefined = undefined;
 
-let subscriptions: vscode.Disposable[] = [];
+const subscriptions: vscode.Disposable[] = [];
 
 async function setActive(active: boolean): Promise<void> {
     isActive = active;
     await vscode.commands.executeCommand('setContext', 'privateExtensions:active', active);
 }
 
-async function doActivate(context: vscode.ExtensionContext) {
-    if (
-        (registryProvider === undefined) ||
-        (extensionInfo === undefined)) {
+async function doActivate() {
+    if (registryProvider === undefined || extensionInfo === undefined) {
         return;
     }
 
@@ -60,15 +58,15 @@ async function doDeactivate() {
 
 function shouldBeActive(): boolean {
     if (registryProvider === undefined) {
-        return false
+        return false;
     }
 
     return registryProvider.getRegistries().length > 0;
 }
 
-async function handleActivation(context: vscode.ExtensionContext) {
+async function handleActivation() {
     if (!isActive && shouldBeActive()) {
-        await doActivate(context);
+        await doActivate();
     } else if (isActive && !shouldBeActive()) {
         await doDeactivate();
     }
@@ -82,8 +80,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     context.subscriptions.push(extensionInfo);
     context.subscriptions.push(registryProvider);
 
-    await handleActivation(context);
-    context.subscriptions.push(registryProvider.onDidChangeRegistries(async () => await handleActivation(context)));
+    await handleActivation();
+    context.subscriptions.push(registryProvider.onDidChangeRegistries(async () => await handleActivation()));
 }
 
 export async function deactivate(): Promise<void> {
