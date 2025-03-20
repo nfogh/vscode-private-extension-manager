@@ -15,6 +15,10 @@ import { RegistryView } from './views/registryView';
 nls.config({ messageFormat: nls.MessageFormat.file })();
 
 let isActive = false;
+let extensionInfo: ExtensionInfoService | undefined = undefined;
+let registryProvider: RegistryProvider | undefined = undefined;
+
+let subscriptions: vscode.Disposable[] = [];
 
 async function setActive(active: boolean): Promise<void> {
     isActive = active;
@@ -22,17 +26,19 @@ async function setActive(active: boolean): Promise<void> {
 }
 
 async function doActivate(context: vscode.ExtensionContext) {
-    const extensionInfo = new ExtensionInfoService();
-    const registryProvider = new RegistryProvider(extensionInfo);
+    if (
+        (registryProvider === undefined) ||
+        (extensionInfo === undefined)) {
+        return;
+    }
+
     const registryView = new RegistryView(registryProvider, extensionInfo);
     const updateChecker = new UpdateChecker(registryProvider, extensionInfo);
     const recommendedExtensionPrompter = new RecommendedExtensionPrompter(registryProvider, () => {
         return new Set(vscode.extensions.all.map((ext) => ext.id));
     });
 
-    context.subscriptions.push(
-        extensionInfo,
-        registryProvider,
+    subscriptions.push(
         registryView,
         updateChecker,
         registerCommands(registryProvider, registryView, updateChecker, extensionInfo),
@@ -45,22 +51,25 @@ async function doActivate(context: vscode.ExtensionContext) {
 
 async function doDeactivate() {
     await setActive(false);
+
+    subscriptions.forEach((subscription) => subscription.dispose());
     // TODO: should we have some sort of lock file or ref count so we don't
     // delete the cache if another instance of vscode is still active?
     await deleteNpmDownloads();
 }
 
-async function shouldBeActive(): Promise<boolean> {
-    return (
-        vscode.workspace.getConfiguration('privateExtensions').has('registries') ||
-        (await vscode.workspace.findFiles('.vscode/extensions.private.json')).length !== 0
-    );
+function shouldBeActive(): boolean {
+    if (registryProvider === undefined) {
+        return false
+    }
+
+    return registryProvider.getRegistries().length > 0;
 }
 
 async function handleActivation(context: vscode.ExtensionContext) {
-    if (!isActive && (await shouldBeActive())) {
+    if (!isActive && shouldBeActive()) {
         await doActivate(context);
-    } else if (isActive && !(await shouldBeActive())) {
+    } else if (isActive && !shouldBeActive()) {
         await doDeactivate();
     }
 }
@@ -68,12 +77,13 @@ async function handleActivation(context: vscode.ExtensionContext) {
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     setContext(context);
 
+    extensionInfo = new ExtensionInfoService();
+    registryProvider = new RegistryProvider(extensionInfo);
+    context.subscriptions.push(extensionInfo);
+    context.subscriptions.push(registryProvider);
+
     await handleActivation(context);
-    vscode.workspace.onDidChangeConfiguration(async (configurationChangedEvent) => {
-        if (configurationChangedEvent.affectsConfiguration('privateExtensions')) {
-            await handleActivation(context);
-        }
-    });
+    context.subscriptions.push(registryProvider.onDidChangeRegistries(async () => await handleActivation(context)));
 }
 
 export async function deactivate(): Promise<void> {
