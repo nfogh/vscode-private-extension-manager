@@ -14,24 +14,29 @@ import { RegistryView } from './views/registryView';
 
 nls.config({ messageFormat: nls.MessageFormat.file })();
 
-async function setActive(enabled: boolean): Promise<void> {
-    await vscode.commands.executeCommand('setContext', 'privateExtensions:active', enabled);
+let isActive = false;
+let extensionInfo: ExtensionInfoService | undefined = undefined;
+let registryProvider: RegistryProvider | undefined = undefined;
+
+const subscriptions: vscode.Disposable[] = [];
+
+async function setActive(active: boolean): Promise<void> {
+    isActive = active;
+    await vscode.commands.executeCommand('setContext', 'privateExtensions:active', active);
 }
 
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
-    setContext(context);
+async function doActivate() {
+    if (registryProvider === undefined || extensionInfo === undefined) {
+        return;
+    }
 
-    const extensionInfo = new ExtensionInfoService();
-    const registryProvider = new RegistryProvider(extensionInfo);
     const registryView = new RegistryView(registryProvider, extensionInfo);
     const updateChecker = new UpdateChecker(registryProvider, extensionInfo);
     const recommendedExtensionPrompter = new RecommendedExtensionPrompter(registryProvider, () => {
         return new Set(vscode.extensions.all.map((ext) => ext.id));
     });
 
-    context.subscriptions.push(
-        extensionInfo,
-        registryProvider,
+    subscriptions.push(
         registryView,
         updateChecker,
         registerCommands(registryProvider, registryView, updateChecker, extensionInfo),
@@ -42,11 +47,45 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     await setActive(true);
 }
 
-export async function deactivate(): Promise<void> {
+async function doDeactivate() {
     await setActive(false);
+
+    subscriptions.forEach((subscription) => subscription.dispose());
     // TODO: should we have some sort of lock file or ref count so we don't
     // delete the cache if another instance of vscode is still active?
     await deleteNpmDownloads();
+}
+
+function shouldBeActive(): boolean {
+    if (registryProvider === undefined) {
+        return false;
+    }
+
+    return registryProvider.getRegistries().length > 0;
+}
+
+async function handleActivation() {
+    if (!isActive && shouldBeActive()) {
+        await doActivate();
+    } else if (isActive && !shouldBeActive()) {
+        await doDeactivate();
+    }
+}
+
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
+    setContext(context);
+
+    extensionInfo = new ExtensionInfoService();
+    registryProvider = new RegistryProvider(extensionInfo);
+    context.subscriptions.push(extensionInfo);
+    context.subscriptions.push(registryProvider);
+
+    await handleActivation();
+    context.subscriptions.push(registryProvider.onDidChangeRegistries(async () => await handleActivation()));
+}
+
+export async function deactivate(): Promise<void> {
+    await doDeactivate();
 }
 
 function registerCommands(

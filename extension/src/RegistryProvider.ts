@@ -95,11 +95,25 @@ export class RegistryProvider implements Disposable {
         // dedupeRegistries() keeps the first item for each duplicate registry.
         // Add workspace registries first so they override duplicate items in
         // the user configuration.
-        for (const folder of this.folders) {
-            registries.push(...folder.getRegistries());
+        try {
+            for (const folder of this.folders) {
+                registries.push(...folder.getRegistries());
+            }
+        } catch (e: any) {
+            if (!(e instanceof TypeError)) {
+                throw e;
+            }
+            getLogger().log(e.message);
         }
 
-        registries.push(...this.getUserRegistries());
+        try {
+            registries.push(...this.getUserRegistries());
+        } catch (e: any) {
+            if (!(e instanceof TypeError)) {
+                throw e;
+            }
+            getLogger().log(e.message);
+        }
 
         return dedupeRegistries(registries);
     }

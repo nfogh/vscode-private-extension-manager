@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.9.11
+
+-   Fixed: Extension didn't activate on user registries
+
 ## 1.9.10
 
 -   Fixed: Set repository to the right github repo
