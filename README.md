@@ -1,15 +1,15 @@
-# Private Extension Manager for Visual Studio Code
+# Private Extension Marketplace for Visual Studio Code
 
 ![build status](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/main.yml/badge.svg)
 ![publish status](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/publish.yml/badge.svg)
 [![CodeQL](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/github-code-scanning/codeql)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-Private Extension Manager is a Visual Studio Code extension that lets you find,
-install, and update extensions from any NPM registry. This lets you distribute
-organization-specific extensions using a private registry server such as
-[Sonatype Nexus](https://www.sonatype.com/product-nexus-repository) or
-[Verdaccio](https://verdaccio.org).
+Private Extension Marketplace is a Visual Studio Code extension that lets you find,
+install, and update extensions from any NPM registry or OpenVSX instance. This lets
+you distribute organization-specific extensions using a private registry server such as
+[Sonatype Nexus](https://www.sonatype.com/product-nexus-repository),
+[Verdaccio](https://verdaccio.org) or [OpenVSX](https://github.com/eclipse/openvsx).
 
 The `extension` folder contains the main extension.
 See its [README](extension/README.md) for more details.
@@ -35,7 +35,7 @@ general information on developing extensions.
 
 ## Setup
 
-1. Clone the repository and open the `private-extension-manager.code-workspace`
+1. Clone the repository and open the `private-extension-marketplace.code-workspace`
 workspace in VS Code.
 2. When prompted, install all the recommended extensions. If no prompt appears,
 press `Ctrl+Shift+P` and run the `Extensions: Show Recommended Extensions`
@@ -65,7 +65,7 @@ Press `F5` or click the green triangle button to start debugging.
 
 ## Remote Development
 
-To debug Private Extension Manager when using a remote extension such as
+To debug Private Extension Marketplace when using a remote extension such as
 [Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh),
 open a VS Code window to the remote machine, then perform the setup as described
 above. When you start debugging the extension, this will open another remote
