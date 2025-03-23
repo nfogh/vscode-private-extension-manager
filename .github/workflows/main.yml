@@ -4,6 +4,8 @@ on: [push, pull_request]
 
 jobs:
   build:
+    permissions:
+      contents: read
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
