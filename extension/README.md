@@ -137,15 +137,14 @@ private extension registries and any recommended extensions. You can use the
 **Private Extensions: Configure Workspace Registries** commands to open this
 file, creating it from a template if it does not already exist.
 
-The file has the following structure (for an npm registry):
+The file has the following structure:
 
 ```JSON
 {
     "registries": [
         {
             "name": "My Private Registry",
-            "registry": "https://my-private.registry",
-            "type": "npm"
+            "registry": "https://my-private.registry"
         }
     ],
     "recommendations": [
@@ -154,15 +153,17 @@ The file has the following structure (for an npm registry):
 }
 ```
 
-For an OpenVSX registry, use the type "vsx".
+The private extension marketplace will try to autodetect which kind of repository
+it is communicating with (npm or openvsx). If this somehow fails, you can force
+the type of registry by explicitly setting the type like so:
 
 ```JSON
 {
     "registries": [
         {
-            "name": "OpenVSX",
-            "registry": "https://open-vsx.org",
-            "type": "vsx"
+            "name": "My Private Registry",
+            "registry": "https://my-private.registry",
+            "type": "npm"
         }
     ],
     "recommendations": [
@@ -188,7 +189,7 @@ extensions. Each item supports the following fields:
     Set it to false when using a server that doesn't properly handle the `from` parameter of the NPM search API.
     You may also need to increase `limit` to get all results if this is disabled.
 -   **limit**: (Optional) Number of results to limit each query to when requesting package results. Default: 100.
--   **type**: (Optional) The type of the repository. Can be `npm` or `vsx`. If not given, it defaults to `npm`.
+-   **type**: (Optional) The type of the repository. Can be `npm` or `vsx`. If not given, it will be autodetected.
 -   If the type is npm, any options supported by [npm-registry-fetch](https://github.com/npm/npm-registry-fetch#-fetch-options).
     Use these if you need to set authentication, a proxy, or other options.
 
