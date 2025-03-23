@@ -4,7 +4,6 @@ import * as os from 'os';
 import { SemVer } from 'semver';
 import sinon = require('sinon');
 import 'source-map-support/register';
-import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from '../../extensionInfo';
@@ -16,8 +15,6 @@ import { CommonStubs, stubGlobalConfiguration, stubRemoteName } from '../stubs';
 nls.config({ locale: 'pseudo' });
 
 suite('Package', function () {
-    vscode.window.showInformationMessage(`Start ${this.title} tests`);
-
     let stubs: CommonStubs;
     let extensionInfo: ExtensionInfoService;
 

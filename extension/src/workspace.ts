@@ -12,7 +12,9 @@ export async function pickWorkspaceFolder(): Promise<vscode.WorkspaceFolder | un
     const folders = vscode.workspace.workspaceFolders;
 
     if (!folders?.length) {
-        vscode.window.showInformationMessage(localize('no.workspace.folders', 'There are no workspace folders open.'));
+        void vscode.window.showInformationMessage(
+            localize('no.workspace.folders', 'There are no workspace folders open.'),
+        );
         return undefined;
     }
 

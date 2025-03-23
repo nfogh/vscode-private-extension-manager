@@ -1,4 +1,4 @@
-import { assert, use } from 'chai';
+import { assert, expect, use } from 'chai';
 import chaiSubset = require('chai-subset');
 import chaiSubsetInOrder = require('chai-subset-in-order');
 import * as search from 'libnpmsearch';
@@ -24,9 +24,7 @@ use(chaiSubsetInOrder);
 nls.config({ locale: 'pseudo' });
 
 // Test suite should be run inside workspace test-fixtures/fixture1
-suite('Registry Provider', function () {
-    vscode.window.showInformationMessage(`Start ${this.title} tests`);
-
+suite('Registry Provider', async function () {
     let scope1: nock.Scope;
     let scope2: nock.Scope;
     let extensionInfo: ExtensionInfoService;
@@ -41,6 +39,7 @@ suite('Registry Provider', function () {
         mockSearch(scope1, '*', Object.values(WORKSPACE_SEARCH));
         mockSearch(scope1, 'keywords:test', [WORKSPACE_SEARCH.test]);
 
+        scope1.get('/-/ping').reply(200, '{}');
         scope1.get('/test').reply(200, WORKSPACE_PACKAGE.test);
         scope1.get('/recommended1').reply(200, WORKSPACE_PACKAGE.recommended1);
         scope1.get('/recommended2').reply(200, WORKSPACE_PACKAGE.recommended2);
@@ -50,6 +49,7 @@ suite('Registry Provider', function () {
         scope2 = nock(USER_REGISTRY_URL);
         scope2.persist();
 
+        scope2.get('/-/ping').reply(200, '{}');
         mockSearch(scope2, '*', Object.values(USER_SEARCH));
 
         scope2.get('/user').reply(200, USER_PACKAGE.user);
@@ -79,7 +79,7 @@ suite('Registry Provider', function () {
     test('Get registries', async function () {
         stubGlobalConfiguration('privateExtensions', USER_REGISTRY_CONFIG);
 
-        const provider = new RegistryProvider(extensionInfo);
+        const provider = await RegistryProvider.create(extensionInfo);
 
         const registries = provider.getRegistries();
 
@@ -94,7 +94,7 @@ suite('Registry Provider', function () {
     test('Get recommendations', async function () {
         stubGlobalConfiguration('privateExtensions', USER_REGISTRY_CONFIG);
 
-        const provider = new RegistryProvider(extensionInfo);
+        const provider = await RegistryProvider.create(extensionInfo);
 
         const recommendations = provider.getRecommendedExtensions();
         const expected = new Set(['test.recommended1', 'test.recommended2']);
@@ -105,7 +105,7 @@ suite('Registry Provider', function () {
     test('Get unique packages', async function () {
         stubGlobalConfiguration('privateExtensions', USER_REGISTRY_CONFIG);
 
-        const provider = new RegistryProvider(extensionInfo);
+        const provider = await RegistryProvider.create(extensionInfo);
 
         const packages = await provider.getUniquePackages();
         packages.sort(Package.compare);
@@ -124,7 +124,7 @@ suite('Registry Provider', function () {
     test('Tracking custom channel', async function () {
         stubGlobalConfiguration('privateExtensions', USER_REGISTRY_CONFIG_CHANNEL);
 
-        const provider = new RegistryProvider(extensionInfo);
+        const provider = await RegistryProvider.create(extensionInfo);
         const packages = await provider.getUniquePackages();
         packages.sort(Package.compare);
 
@@ -144,16 +144,7 @@ suite('Registry Provider', function () {
             registries: 42,
         });
 
-        const provider = new RegistryProvider(extensionInfo);
-        const type = 'Array<{ name: string, registry?: string, type?: ("npm" | "vsx") }>';
-
-        assert.throws(
-            () => {
-                provider.getUserRegistries();
-            },
-            TypeError,
-            `\uFF3B${INVALID_CONFIG_CONTEXT}: \uFF3BExpeecteed ${type} buut goot 42\uFF3D\uFF3D`,
-        );
+        expect((await RegistryProvider.create(extensionInfo)).getRegistries()).has.lengthOf(2);
     });
 
     test('Invalid user config: missing name', async function () {
@@ -161,15 +152,7 @@ suite('Registry Provider', function () {
             registries: [{ registry: USER_REGISTRY_URL }],
         });
 
-        const provider = new RegistryProvider(extensionInfo);
-
-        assert.throws(
-            () => {
-                provider.getUserRegistries();
-            },
-            TypeError,
-            `\uFF3B${INVALID_CONFIG_CONTEXT}: \uFF3BExpeecteed string aat 0.name buut goot undefined\uFF3D\uFF3D`,
-        );
+        expect((await RegistryProvider.create(extensionInfo)).getRegistries()).has.lengthOf(2);
     });
 
     test('Invalid user config: wrong name type', async function () {
@@ -177,15 +160,7 @@ suite('Registry Provider', function () {
             registries: [{ name: 42 }],
         });
 
-        const provider = new RegistryProvider(extensionInfo);
-
-        assert.throws(
-            () => {
-                provider.getUserRegistries();
-            },
-            TypeError,
-            `\uFF3B${INVALID_CONFIG_CONTEXT}: \uFF3BExpeecteed string aat 0.name buut goot 42\uFF3D\uFF3D`,
-        );
+        expect((await RegistryProvider.create(extensionInfo)).getRegistries()).has.lengthOf(2);
     });
 
     test('Invalid user config: wrong registry type', async function () {
@@ -193,15 +168,7 @@ suite('Registry Provider', function () {
             registries: [{ name: 'User Registry', registry: 42 }],
         });
 
-        const provider = new RegistryProvider(extensionInfo);
-
-        assert.throws(
-            () => {
-                provider.getUserRegistries();
-            },
-            TypeError,
-            `\uFF3B${INVALID_CONFIG_CONTEXT}: \uFF3BExpeecteed string aat 0.registry buut goot 42\uFF3D\uFF3D`,
-        );
+        expect((await RegistryProvider.create(extensionInfo)).getRegistries()).has.lengthOf(2);
     });
 
     test('Invalid user config: mixed values', async function () {
@@ -212,19 +179,9 @@ suite('Registry Provider', function () {
             ],
         });
 
-        const provider = new RegistryProvider(extensionInfo);
-
-        assert.throws(
-            () => {
-                provider.getUserRegistries();
-            },
-            TypeError,
-            `\uFF3B${INVALID_CONFIG_CONTEXT}: \uFF3BExpeecteed string aat 1.name buut goot 42\uFF3D\uFF3D`,
-        );
+        expect((await RegistryProvider.create(extensionInfo)).getRegistries()).has.lengthOf(2);
     });
 });
-
-const INVALID_CONFIG_CONTEXT = '\uFF3BpriivaateeExteensiioons.reegiistriiees seettiing iis iinvaaliid\uFF3D';
 
 const WORKSPACE_REGISTRY_URL = 'https://workspace.registry';
 const USER_REGISTRY_URL = 'https://user.registry';

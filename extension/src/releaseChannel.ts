@@ -56,7 +56,7 @@ function getChannelConfig() {
 }
 
 function setChannelConfig(channels?: Record<string, string>) {
-    getConfig().update('channels', channels, ConfigurationTarget.Global);
+    void getConfig().update('channels', channels, ConfigurationTarget.Global);
 }
 
 function cloneConfig<T>(obj: Record<string, T>): Record<string, T> {

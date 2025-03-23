@@ -3,7 +3,7 @@ import { isLeft } from 'fp-ts/lib/Either';
 import * as fs from 'fs';
 import * as fspromises from 'fs/promises';
 import { PathReporter } from 'io-ts/lib/PathReporter';
-import * as fetch from 'node-fetch';
+import fetch from 'node-fetch';
 import path = require('path');
 import { SemVer } from 'semver';
 import { CancellationToken, Uri } from 'vscode';
@@ -41,6 +41,16 @@ export class VsxRegistry implements Registry {
     readonly name: string;
     readonly source: RegistrySource;
     readonly registryUrl: string;
+
+    public static async isRegistry(url: string): Promise<boolean> {
+        try {
+            const reply = await fetch(url + '/api/version');
+            const versionResult = await reply.json();
+            return versionResult.version !== undefined;
+        } catch (_error: any) {
+            return false;
+        }
+    }
 
     constructor(
         extensionInfo: ExtensionInfoService,
@@ -84,7 +94,7 @@ export class VsxRegistry implements Registry {
             await fspromises.mkdir(downloadDir, { recursive: true });
             const fileStream = fs.createWriteStream(filePath);
 
-            const data = await fetch.default(pkg.vsixFile);
+            const data = await fetch(pkg.vsixFile);
             await new Promise((resolve, reject) => {
                 data.body.pipe(fileStream);
                 data.body.on('error', reject);
@@ -119,7 +129,7 @@ export class VsxRegistry implements Registry {
         let from = 0;
         while (!stop) {
             const query = `${this.registryUrl}/api/-/search?query=${this.query}&size=100&offset=${from}`;
-            const reply = await fetch.default(query);
+            const reply = await fetch(query);
             const searchResult = await reply.json();
 
             const result = SearchResultRT.decode(searchResult);
@@ -173,7 +183,7 @@ export class VsxRegistry implements Registry {
     async getPackageVersions(name: string): Promise<VersionInfo[]> {
         const [namespace, extension] = name.split('.');
         const query = `${this.registryUrl}/api/${namespace}/${extension}/versions`;
-        const reply = await fetch.default(query);
+        const reply = await fetch(query);
         const versionsResult = await reply.json();
 
         const result = VersionsResultRT.decode(versionsResult);
@@ -204,7 +214,7 @@ export class VsxRegistry implements Registry {
         if (version) {
             query += `&extensionVersion=${version}`;
         }
-        const reply = await fetch.default(query);
+        const reply = await fetch(query);
         const queryResult = await reply.json();
 
         const result = QueryResultRT.decode(queryResult);

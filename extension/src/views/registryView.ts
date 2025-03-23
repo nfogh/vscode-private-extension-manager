@@ -73,26 +73,25 @@ export class RegistryView implements Disposable {
     }
 
     private startBadgeUpdater(extensionsTree: vscode.TreeView<Element>): Disposable {
-        return this.registryProvider.onDidChangeRegistries(() => {
-            this.registryProvider.getUniquePackages().then((pkgs) => {
-                const packagesWithUpdates = pkgs.filter((pkg) => pkg.isUpdateAvailable);
-                extensionsTree.badge = {
-                    value: packagesWithUpdates.length,
-                    tooltip: packagesWithUpdates.length > 0 ? 'Updates available' : 'No updates available',
-                };
-            });
+        return this.registryProvider.onDidChangeRegistries(async () => {
+            const pkgs = await this.registryProvider.getUniquePackages();
+            const packagesWithUpdates = pkgs.filter((pkg) => pkg.isUpdateAvailable);
+            extensionsTree.badge = {
+                value: packagesWithUpdates.length,
+                tooltip: packagesWithUpdates.length > 0 ? 'Updates available' : 'No updates available',
+            };
         });
     }
 
     /**
      * Reloads the tree views and the extension details view if it is open.
      */
-    public refresh(): void {
+    public async refresh(): Promise<void> {
         // Refreshing the registry provider will trigger all tree views to update.
-        this.registryProvider.refresh();
+        await this.registryProvider.refresh();
 
         if (this.extensionView.visible) {
-            this.extensionView.refresh();
+            await this.extensionView.refresh();
         }
     }
 

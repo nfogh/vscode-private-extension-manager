@@ -5,7 +5,6 @@ import { after, afterEach, before, beforeEach } from 'mocha';
 import * as nock from 'nock';
 import { SemVer } from 'semver';
 import 'source-map-support/register';
-import * as vscode from 'vscode';
 import { Uri } from 'vscode';
 
 import { ExtensionInfoService } from '../../extensionInfo';
@@ -18,8 +17,6 @@ import { clearCache, mockSearch, PackageMetadata } from '../npmUtil';
 use(chaiSubset);
 
 suite('Registry Package Search', function () {
-    vscode.window.showInformationMessage(`Start ${this.title} tests`);
-
     let scope: nock.Scope;
     let extensionInfo: ExtensionInfoService;
 

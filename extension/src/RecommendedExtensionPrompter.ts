@@ -1,7 +1,12 @@
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls/node';
 
 import * as install from './install';
+import { getLogger } from './logger';
 import { RegistryProvider } from './RegistryProvider';
+import { toString } from './util';
+
+const localize = nls.loadMessageBundle();
 
 interface RemoteHelperExtensionInfo {
     id: string;
@@ -13,11 +18,16 @@ export class RecommendedExtensionPrompter implements vscode.Disposable {
     private readonly disposable: vscode.Disposable;
 
     public async isInstalledRemote(extension: string): Promise<boolean> {
-        const extensionInfo = await vscode.commands.executeCommand<RemoteHelperExtensionInfo>(
-            '_privateExtensionMarketplace.remoteHelper.getExtension',
-            extension,
-        );
-        return extensionInfo !== undefined;
+        try {
+            const extensionInfo = await vscode.commands.executeCommand<RemoteHelperExtensionInfo>(
+                '_privateExtensionMarketplace.remoteHelper.getExtension',
+                extension,
+            );
+            return extensionInfo !== undefined;
+        } catch (ex) {
+            getLogger().log(localize('warn.remote.helper.fail', 'Failed to call remote helper:\n{0}', toString(ex)));
+            return false;
+        }
     }
 
     public async removeInstalledExtensions(extensions: string[]): Promise<string[]> {
@@ -50,12 +60,12 @@ export class RecommendedExtensionPrompter implements vscode.Disposable {
                 'Show Recommendations',
             );
             if (reply === 'Install') {
-                vscode.window.showInformationMessage(`Installing ${recommendedButNotInstalled.join(', ')}`);
-                for (const ext of recommendedButNotInstalled) {
-                    install.installExtension(this.registryProvider, ext);
-                }
+                void vscode.window.showInformationMessage(`Installing ${recommendedButNotInstalled.join(', ')}`);
+                await Promise.all(
+                    recommendedButNotInstalled.map((ext) => install.installExtension(this.registryProvider, ext)),
+                );
             } else if (reply === 'Show Recommendations') {
-                vscode.commands.executeCommand('privateExtensions.recommended.focus');
+                await vscode.commands.executeCommand('privateExtensions.recommended.focus');
             }
         }
     }
@@ -73,7 +83,7 @@ export class RecommendedExtensionPrompter implements vscode.Disposable {
             }
         });
         if (!vscode.workspace.getConfiguration('extensions').get<boolean>('ignoreRecommendations', false)) {
-            this.configurationChanged();
+            void this.configurationChanged();
         }
     }
 

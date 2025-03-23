@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.10.0
+
+-   Added: Autodetect registry type if "type" is not specified
+
 ## 1.9.11
 
 -   Fixed: Extension didn't activate on user registries

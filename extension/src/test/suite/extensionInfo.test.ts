@@ -2,14 +2,11 @@ import { assert } from 'chai';
 import { afterEach, beforeEach } from 'mocha';
 import sinon = require('sinon');
 import 'source-map-support/register';
-import * as vscode from 'vscode';
 
 import { ExtensionInfoService } from '../../extensionInfo';
 import { stubRemoteName, CommonStubs } from '../stubs';
 
 suite('Extension Info', function () {
-    vscode.window.showInformationMessage(`Start ${this.title} tests`);
-
     let stubs: CommonStubs;
     let extensionInfo: ExtensionInfoService;
 

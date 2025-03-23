@@ -4,7 +4,6 @@ import { before, after } from 'mocha';
 import * as nock from 'nock';
 import { SemVer } from 'semver';
 import sinon = require('sinon');
-import * as vscode from 'vscode';
 
 import { ExtensionInfoService } from '../../extensionInfo';
 import { VsxRegistry } from '../../VsxRegistry';
@@ -17,6 +16,8 @@ const REGISTRY_URL = 'https://registry.local';
 function createFakeVSXServer(registryUrl: string): nock.Scope {
     const mock = nock(registryUrl);
     mock.persist();
+
+    mock.get('/api/version').reply(200, '{ version: "1.2.3" ');
 
     mock.get('/api/-/search')
         .query((query) => query.query === '' && query.offset === '0')
@@ -69,8 +70,6 @@ function createFakeVSXServer(registryUrl: string): nock.Scope {
 }
 
 suite('VSX Registry Package Search', function () {
-    vscode.window.showInformationMessage(`Start ${this.title} tests`);
-
     let fakeVsxRegistry: nock.Scope;
 
     before(() => {

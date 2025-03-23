@@ -1,4 +1,4 @@
-import { isLeft } from 'fp-ts/lib/Either';
+import { isLeft, isRight } from 'fp-ts/lib/Either';
 import * as t from 'io-ts';
 import * as nls from 'vscode-nls/node';
 
@@ -107,4 +107,9 @@ export function assertType<T>(
         }
         throw new errorType(message);
     }
+}
+
+export function decodeType<T>(obj: unknown, type: t.Type<T>): T | undefined {
+    const result = type.decode(obj);
+    return isRight(result) ? result.right : undefined;
 }

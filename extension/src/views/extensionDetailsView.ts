@@ -54,7 +54,7 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
             // displayed extension may have changed.
             vscode.workspace.onDidChangeConfiguration((e) => {
                 if (e.affectsConfiguration('privateExtensions.channels')) {
-                    this.refresh();
+                    void this.refresh();
                 }
             }),
         );

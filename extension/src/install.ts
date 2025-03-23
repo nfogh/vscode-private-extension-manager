@@ -107,7 +107,7 @@ export async function updateExtensions(extensionInfo: ExtensionInfoService, pack
 export async function showReloadPrompt(message: string): Promise<void> {
     const reload = await vscode.window.showInformationMessage(message, localize('reload.now', 'Reload Now'));
     if (reload) {
-        vscode.commands.executeCommand('workbench.action.reloadWindow');
+        await vscode.commands.executeCommand('workbench.action.reloadWindow');
     }
 }
 

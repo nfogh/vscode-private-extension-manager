@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as t from 'io-ts';
 import * as npmsearch from 'libnpmsearch';
 import { Options } from 'libnpmsearch';
+import fetch = require('node-fetch');
 import * as npa from 'npm-package-arg';
 import * as npmfetch from 'npm-registry-fetch';
 import * as pacote from 'pacote';
@@ -54,12 +55,25 @@ const PackageVersionData = options(
 );
 type PackageVersionData = t.TypeOf<typeof PackageVersionData>;
 
+function isEmptyJson(json: any): boolean {
+    return Object.keys(json).length === 0;
+}
+
 /**
  * Represents an NPM registry.
  */
 export class NpmRegistry implements Registry {
     public readonly query: string | string[];
     public readonly enablePagination: boolean;
+
+    public static async isRegistry(url: string): Promise<boolean> {
+        try {
+            const reply = await fetch(url + '/-/ping');
+            return isEmptyJson(await reply.json());
+        } catch {
+            return false;
+        }
+    }
 
     public readonly options: Partial<Options>;
 
@@ -154,7 +168,7 @@ export class NpmRegistry implements Registry {
                     const settingsJsonLink = `[${openSettingsJson}](command:workbench.action.openSettingsJson)`;
 
                     // TODO: Add a quick link to reset to 'latest' via command
-                    window.showErrorMessage(
+                    void window.showErrorMessage(
                         localize(
                             'invalid.channel',
                             '{0} Your "privateExtensions.channels" setting may be invalid. {1} to fix.',
@@ -284,7 +298,7 @@ export class NpmRegistry implements Registry {
         }
 
         if (from >= MAX_RESULTS) {
-            window.showWarningMessage(
+            void window.showWarningMessage(
                 localize(
                     'warn.too.many.results',
                     'Private extension registry {0} returned too many results. If your server does not handle ' +

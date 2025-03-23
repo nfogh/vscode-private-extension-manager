@@ -16,11 +16,13 @@ export class DeleteCacheCommand implements Command {
         const cache = getNpmCacheDir();
 
         if (!cache) {
-            vscode.window.showInformationMessage(localize('cache.already.deleted', 'NPM cache is already deleted.'));
+            void vscode.window.showInformationMessage(
+                localize('cache.already.deleted', 'NPM cache is already deleted.'),
+            );
             return;
         }
 
-        vscode.window.withProgress(
+        void vscode.window.withProgress(
             {
                 title: localize('deleting.npm.cache', 'Deleting NPM cache.'),
                 location: vscode.ProgressLocation.Notification,
@@ -43,11 +45,11 @@ export class GarbageCollectCacheCommand implements Command {
         const cache = getNpmCacheDir();
 
         if (!cache) {
-            vscode.window.showErrorMessage(localize('cache.missing', 'NPM cache is missing.'));
+            void vscode.window.showErrorMessage(localize('cache.missing', 'NPM cache is missing.'));
             return;
         }
 
-        vscode.window.withProgress(
+        void vscode.window.withProgress(
             {
                 title: localize('cleaning.npm.cache', 'Cleaning NPM cache.'),
                 location: vscode.ProgressLocation.Notification,

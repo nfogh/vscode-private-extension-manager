@@ -7,6 +7,6 @@ export class RefreshCommand implements Command {
     constructor(private readonly registryView: RegistryView) {}
 
     public execute(): void {
-        this.registryView.refresh();
+        void this.registryView.refresh();
     }
 }

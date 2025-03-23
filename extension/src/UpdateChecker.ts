@@ -39,9 +39,9 @@ export class UpdateChecker implements Disposable {
         );
 
         if (this.isAutomaticUpdateEnabled) {
-            this.initTimeout = global.setTimeout(() => {
+            this.initTimeout = global.setTimeout(async () => {
                 this.initTimeout = undefined;
-                this.checkForUpdates(true);
+                await this.checkForUpdates(true);
                 this.setAutomaticCheckInterval();
             }, INIT_DELAY_S * 1000);
         }
@@ -100,9 +100,9 @@ export class UpdateChecker implements Disposable {
         }
 
         if (this.isAutomaticUpdateEnabled) {
-            this.checkInterval = global.setInterval(() => {
+            this.checkInterval = global.setInterval(async () => {
                 getLogger().log(localize('start.update.check', 'Starting automatic update check'));
-                this.checkForUpdates(true);
+                await this.checkForUpdates(true);
             }, this.intervalMS);
         }
     }

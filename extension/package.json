@@ -2,7 +2,7 @@
     "name": "private-extension-marketplace",
     "displayName": "Private Extension Marketplace",
     "description": "Manages extensions hosted in private NPM/OpenVSX registries.",
-    "version": "1.9.11",
+    "version": "1.10.0",
     "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
@@ -185,12 +185,14 @@
                 {
                     "id": "privateExtensions.extensions",
                     "name": "%views.privateExtensions.extensions.name%",
-                    "when": "privateExtensions:active"
+                    "when": "privateExtensions:active",
+                    "icon": "media/extensions.svg"
                 },
                 {
                     "id": "privateExtensions.recommended",
                     "name": "%views.privateExtensions.recommended.name%",
-                    "when": "privateExtensions:active"
+                    "when": "privateExtensions:active",
+                    "icon": "media/extensions.svg"
                 }
             ]
         },
@@ -374,7 +376,7 @@
         "decompress": "^4.2.1",
         "fp-ts": "^2.11.5",
         "glob": "^11.0.1",
-        "io-ts": "^2.2.12",
+        "io-ts": "^2.2.22",
         "is-unc-path": "^1.0.0",
         "jsonc-parser": "^3.0.0",
         "libnpmsearch": "^9.0.0",

@@ -10,8 +10,8 @@ import { getLogger } from './logger';
 import { NpmRegistry } from './NpmRegistry';
 import { Package } from './Package';
 import { Registry, RegistrySource } from './Registry';
-import { assertType, options } from './typeUtil';
-import { getConfig, readJSONSync } from './util';
+import { decodeType, options } from './typeUtil';
+import { getConfig, readJSON } from './util';
 import { VsxRegistry } from './VsxRegistry';
 
 const localize = nls.loadMessageBundle();
@@ -46,13 +46,18 @@ export class RegistryProvider implements Disposable {
 
     private readonly disposable: Disposable;
     private readonly folders: FolderRegistryProvider[] = [];
-    private isStale = true;
     private userRegistries: Registry[] = [];
 
-    constructor(private readonly extensionInfo: ExtensionInfoService) {
+    public static async create(extensionInfo: ExtensionInfoService): Promise<RegistryProvider> {
+        const registryProvider = new RegistryProvider(extensionInfo);
+        await registryProvider.refresh();
+        return registryProvider;
+    }
+
+    private constructor(private readonly extensionInfo: ExtensionInfoService) {
         this.disposable = Disposable.from(
-            vscode.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders, this),
-            vscode.workspace.onDidChangeConfiguration(this.onDidChangeConfiguration, this),
+            vscode.workspace.onDidChangeWorkspaceFolders(async (e) => await this.onDidChangeWorkspaceFolders(e)),
+            vscode.workspace.onDidChangeConfiguration(async (e) => await this.onDidChangeConfiguration(e)),
         );
 
         if (vscode.workspace.workspaceFolders) {
@@ -74,12 +79,10 @@ export class RegistryProvider implements Disposable {
      *
      * This also fires the `onDidChangeRegistries` event.
      */
-    public refresh(): void {
-        this.isStale = true;
+    public async refresh(): Promise<void> {
+        this.userRegistries = await this.updateUserRegistries();
 
-        for (const folder of this.folders) {
-            folder.refresh();
-        }
+        await Promise.all(this.folders.map((folder) => folder.refresh()));
 
         this._onDidChangeRegistries.fire();
     }
@@ -122,11 +125,6 @@ export class RegistryProvider implements Disposable {
      * Gets the list of registries defined in user settings.
      */
     public getUserRegistries(): readonly Registry[] {
-        if (this.isStale) {
-            this.updateUserRegistries();
-            this.isStale = false;
-        }
-
         return this.userRegistries;
     }
 
@@ -193,44 +191,32 @@ export class RegistryProvider implements Disposable {
     }
 
     private getUserRegistryConfig(): UserRegistry[] {
-        const userRegistries = getConfig().get<any>('registries', []);
+        const userRegistries = decodeType(getConfig().get<any>('registries', []), t.array(UserRegistry));
 
-        assertType(
-            userRegistries,
-            t.array(UserRegistry),
-            localize('user.setting.invalid', 'privateExtensions.registries setting is invalid'),
-        );
-
-        return userRegistries;
+        if (!userRegistries) {
+            getLogger().log(`Invalid registry configuration in user settings`);
+        }
+        return userRegistries ?? [];
     }
 
     private setUserRegistryConfig(registries: readonly UserRegistry[]) {
-        getConfig().update('registries', registries, vscode.ConfigurationTarget.Global);
+        void getConfig().update('registries', registries, vscode.ConfigurationTarget.Global);
     }
 
-    private updateUserRegistries() {
-        this.userRegistries = [];
-
-        const userRegistries = this.getUserRegistryConfig();
-
-        for (const item of userRegistries) {
-            const { name, type, ...options } = item;
-            if (type === 'vsx') {
-                this.userRegistries.push(
-                    new VsxRegistry(this.extensionInfo, name, item.registry ?? 'https://open-vsx.org', options),
-                );
-            } else {
-                this.userRegistries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.User, options));
-            }
-        }
+    private async updateUserRegistries(): Promise<Registry[]> {
+        return await Promise.all(
+            this.getUserRegistryConfig().map((registryConfig) =>
+                createRegistry(registryConfig, this.extensionInfo, RegistrySource.User),
+            ),
+        );
     }
 
-    private onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent) {
+    private async onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent) {
         if (
             e.affectsConfiguration('privateExtensions.registries') ||
             e.affectsConfiguration('privateExtensions.channels')
         ) {
-            this.isStale = true;
+            this.userRegistries = await this.updateUserRegistries();
             this._onDidChangeRegistries.fire();
         }
     }
@@ -278,7 +264,6 @@ class FolderRegistryProvider implements Disposable {
     private static readonly ConfigGlobPattern = 'extensions.private.json';
 
     private readonly configFolder: string;
-    private isStale = true;
     private configFile: vscode.Uri | null;
     private readonly disposable: Disposable;
     private readonly configFileWatcher: vscode.FileSystemWatcher;
@@ -297,18 +282,18 @@ class FolderRegistryProvider implements Disposable {
             this.configFile = null;
         }
 
-        this.configFileWatcher.onDidCreate((uri) => {
+        this.configFileWatcher.onDidCreate(async (uri) => {
             this.configFile = uri;
-            this.handleConfigChange();
+            await this.handleConfigChange();
         });
 
-        this.configFileWatcher.onDidDelete(() => {
+        this.configFileWatcher.onDidDelete(async () => {
             this.configFile = null;
-            this.handleConfigChange();
+            await this.handleConfigChange();
         });
 
-        this.configFileWatcher.onDidChange(() => {
-            this.handleConfigChange();
+        this.configFileWatcher.onDidChange(async () => {
+            await this.handleConfigChange();
         });
 
         this.disposable = Disposable.from(this.configFileWatcher);
@@ -322,62 +307,87 @@ class FolderRegistryProvider implements Disposable {
      * Clears all cached information so that the next call to `getRegistries()`
      * returns a fresh list of registries.
      */
-    public refresh() {
-        this.isStale = true;
+    public async refresh() {
+        await this.updateRegistries();
     }
 
     public getRegistries() {
-        this.updateRegistries();
         return this.registries;
     }
 
     public getRecommendedExtensions() {
-        this.updateRegistries();
         return this.recommendedExtensions;
     }
 
-    private handleConfigChange() {
-        this.isStale = true;
+    private async handleConfigChange() {
+        await this.updateRegistries();
         this._onDidChangeRegistries.fire();
     }
 
-    private updateRegistries() {
-        if (this.isStale) {
-            this.readConfigFile();
-            this.isStale = false;
+    private async updateRegistries() {
+        if (this.configFile) {
+            const [registries, recommendations] = await readConfigFile(this.configFile, this.extensionInfo);
+            this.registries = registries;
+            this.recommendedExtensions = recommendations;
+        } else {
+            this.registries = [];
+            this.recommendedExtensions = [];
         }
     }
+}
 
-    private readConfigFile() {
-        this.registries = [];
-        this.recommendedExtensions = [];
+async function createRegistry(
+    registryConfig: any,
+    extensionInfo: ExtensionInfoService,
+    registrySource: RegistrySource,
+): Promise<Registry> {
+    const { name, type, ...options } = registryConfig;
 
-        if (!this.configFile) {
-            return;
+    if (type) {
+        if (type === 'vsx') {
+            return new VsxRegistry(extensionInfo, name, options.registry ?? 'https://open-vsx.org', options);
+        } else {
+            return new NpmRegistry(extensionInfo, name, registrySource, options);
         }
-
-        const config = readJSONSync(this.configFile);
-
-        assertType(config, ExtensionsConfig, localize('in.file', 'In {0}', this.configFile.fsPath));
-
-        if (config.registries) {
-            for (const registry of config.registries) {
-                const { name, type, ...options } = registry;
-
-                if (type === 'vsx') {
-                    this.registries.push(
-                        new VsxRegistry(this.extensionInfo, name, registry.registry ?? 'https://open-vsx.org', options),
-                    );
-                } else {
-                    this.registries.push(new NpmRegistry(this.extensionInfo, name, RegistrySource.Workspace, options));
-                }
+    } else {
+        // Autodetect registry type
+        if (options.registry) {
+            if (await NpmRegistry.isRegistry(options.registry)) {
+                return new NpmRegistry(extensionInfo, name, registrySource, options);
+            } else if (await VsxRegistry.isRegistry(options.registry)) {
+                return new VsxRegistry(extensionInfo, name, options.registry ?? 'https://open-vsx.org', options);
+            } else {
+                const errorMessage = `Unable to auto-detect registry type for ${options.registry}`;
+                getLogger().log(errorMessage);
+                throw new Error(errorMessage);
             }
-        }
-
-        if (config.recommendations) {
-            this.recommendedExtensions = config.recommendations;
+        } else {
+            return new NpmRegistry(extensionInfo, name, registrySource, options);
         }
     }
+}
+
+async function readConfigFile(
+    configFile: vscode.Uri,
+    extensionInfo: ExtensionInfoService,
+): Promise<[Registry[], string[]]> {
+    const config = decodeType(await readJSON(configFile), ExtensionsConfig);
+    if (config === undefined) {
+        getLogger().log(`Invalid format in ${configFile.fsPath}.`);
+        return [[], []];
+    }
+
+    let registries: Registry[] = [];
+    if (config.registries !== undefined) {
+        registries = await Promise.all(
+            config.registries.map((registryConfig) =>
+                createRegistry(registryConfig, extensionInfo, RegistrySource.Workspace),
+            ),
+        );
+        return [registries, config.recommendations ?? []];
+    }
+
+    return [[], []];
 }
 
 /**

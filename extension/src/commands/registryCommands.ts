@@ -77,7 +77,7 @@ export class RemoveUserRegistryCommand implements Command {
         const registries = this.registryProvider.getUserRegistries();
 
         if (registries.length === 0) {
-            vscode.window.showInformationMessage(localize('no.user.registries', 'There are no user registries.'));
+            void vscode.window.showInformationMessage(localize('no.user.registries', 'There are no user registries.'));
             return undefined;
         }
 

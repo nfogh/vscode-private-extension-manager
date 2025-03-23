@@ -76,7 +76,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     setContext(context);
 
     extensionInfo = new ExtensionInfoService();
-    registryProvider = new RegistryProvider(extensionInfo);
+    registryProvider = await RegistryProvider.create(extensionInfo);
     context.subscriptions.push(extensionInfo);
     context.subscriptions.push(registryProvider);
 
