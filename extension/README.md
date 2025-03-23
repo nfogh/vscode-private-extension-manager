@@ -155,7 +155,8 @@ The file has the following structure:
 
 The private extension marketplace will try to autodetect which kind of repository
 it is communicating with (npm or openvsx). If this somehow fails, you can force
-the type of registry by explicitly setting the type like so:
+the type of registry by explicitly setting the type to either "npm" or "vsx" like
+so:
 
 ```JSON
 {
