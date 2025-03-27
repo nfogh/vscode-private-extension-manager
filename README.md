@@ -1,9 +1,6 @@
-# Private Extension Marketplace for Visual Studio Code
+# This repository has moved to [codeberg.org](https://codeberg.org/nfogh/vscode-private-extension-marketplace)
 
-![build status](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/main.yml/badge.svg)
-![publish status](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/publish.yml/badge.svg)
-[![CodeQL](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/github-code-scanning/codeql)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+# Private Extension Marketplace for Visual Studio Code
 
 Private Extension Marketplace is a Visual Studio Code extension that lets you find,
 install, and update extensions from any NPM registry or OpenVSX instance. This lets
